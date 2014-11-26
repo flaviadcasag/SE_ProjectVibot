@@ -1,0 +1,8 @@
+Eigen/
+GL/
+LIB/
+References/
+VRML/
+QtProject/Mesh/build-MeshLoaderQt-Desktop_Qt_5_3_MinGW_32bit-Debug/
+
+*.pdf
