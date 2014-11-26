@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.2.1, 2014-11-26T13:00:08. -->
+<!-- Written by QtCreator 3.2.1, 2014-11-26T13:33:53. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -223,8 +223,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">MeshLoaderQt</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">MeshLoaderQt2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/Flávia/Desktop/Condorcet/Software Engineering/softengproject/SE_ProjectVibot/QtProject/Mesh/MeshLoaderQt/MeshLoaderQt.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/Flávia/Desktop/Condorcet/Software Engineering/softengproject/SE_ProjectVibot/SE_ProjectVibot/QtProject/Mesh/MeshLoaderQt/MeshLoaderQt.pro</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">MeshLoaderQt.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>

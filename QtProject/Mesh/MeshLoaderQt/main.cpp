@@ -19,6 +19,9 @@
 #include <ctime>
 #include <string>
 #include "NeighborMesh.h"
+//
+#include <windows.h>
+
 
 using namespace std;
 
@@ -63,7 +66,9 @@ int main(int argc,char * argv[]){
     timer.Start();
 
     //load a mesh from a file
-    string file_name ("./../../../VRML/david.wrl");
+    string file_name ("C:\\david.wrl");
+    cout << file_name;
+
     if (!globalmesh.ReadFile(file_name)) exit(0);
 
     timer.Stop();
@@ -180,7 +185,6 @@ int main(int argc,char * argv[]){
     //render a couple of face to face connectivity
     globalmesh.IllustrateF2F_Neigh(100);
 
-
     //renders obtuse triangles?
     /*
     for (int i=0; i<globalmesh.faces.size(); i++)
@@ -219,21 +223,8 @@ int main(int argc,char * argv[]){
     globalmesh.DrawBoudaryEdges();
     glEndList();
 
-    cout << "Numero vertices:" <<  globalmesh.VertexNumber() <<endl;
-    cout << "Numero vertices:" <<  globalmesh.vertices.size() <<endl;
-
     //now render
     glutMainLoop();
-
-    //calculate  the differential coordinates
-
-//    for (int n = 0; n <= globalmesh.vertices.end();n++)
-//    {
-//        Vector3d diff_coord;
-//        diff_coord = ()
-//    }
-
-
 
     return a.exec();
 }
