@@ -35,7 +35,6 @@ void myGLWidget::timeOutSlot()
 
 void myGLWidget::initializeGL()
 {
-
     rotate=0;
     Axis=0;
 
@@ -59,27 +58,36 @@ void myGLWidget::initializeGL()
     Color_Steps.push_back(COL_RED);
 
     setWindowTitle(QString(name.c_str()));
-    setFramesPerSecond(60);
-    n = 0;
 
-    glPolygonMode(GL_FRONT,GL_FILL);  // set the drawing mode to full rendering
-    glEnable(GL_DEPTH_TEST);          //activate Z buffer (hide elements in the back)
+    // set the drawing mode to full rendering
+    glPolygonMode(GL_FRONT,GL_FILL);
 
-    glEnable(GL_POLYGON_OFFSET_FILL); //useful if you want to superpose the rendering in full mode and in wireless mode
-    glPolygonOffset(1.0,1.0);         //convenient settings for polygon offset, do not change this
+    //activate Z buffer (hide elements in the back)
+    glEnable(GL_DEPTH_TEST);
 
-    glEnable(GL_NORMALIZE);           // unit normals, in case you would forget to compute them
-    glEnable(GL_COLOR_MATERIAL);      // now you can associate a color to a point...
+    //useful if you want to superpose the rendering in full mode and in wireless mode
+    glEnable(GL_POLYGON_OFFSET_FILL);
 
-    glClearColor(1.0f,1.0f,1.0f,0.0f);    //background color is white (better for screenshot when writing a paper)
+    //convenient settings for polygon offset, do not change this
+    glPolygonOffset(1.0,1.0);
 
-    glEnable( GL_BLEND );                 //you can activate blending for better rendering...
+    // unit normals, in case you would forget to compute them
+    glEnable(GL_NORMALIZE);
 
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // careful with those parameters, results depend on your graphic card
+    // now you can associate a color to a point...
+    glEnable(GL_COLOR_MATERIAL);
+
+    //background color is white (better for screenshot when writing a paper)
+    glClearColor(1.0f,1.0f,1.0f,0.0f);
+
+    //you can activate blending for better rendering...
+    glEnable( GL_BLEND );
+
+    // careful with those parameters, results depend on your graphic card
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  // activate / disable those and compare ;)
-
+    //activate / disable those and compare ;)
     glEnable( GL_POINT_SMOOTH );
     glHint( GL_POINT_SMOOTH, GL_NICEST );
 
@@ -122,6 +130,7 @@ void myGLWidget::initializeGL()
     timer.Stop();
     cout<<"Egdes construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
 
+    //Init camera parameters based on the globalMesh
     double distance = cam.initCamera(globalMesh);
 
     //adjust displacements consequently
@@ -130,7 +139,6 @@ void myGLWidget::initializeGL()
     objectMove[2] = distance/20;
 
     //creates lights accordingly to the position and size of the object
-
     createLighting();
 
     //compute normals
@@ -160,64 +168,9 @@ void myGLWidget::initializeGL()
     //ok now here render
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-
-
-    //couple of extended neighbourhood computations
-    glDisable(GL_LIGHTING);
-    //globalMesh.IllustratePointNeighbourhoodComputation(150,10);
-    //globalMesh.IllustrateFaceNeighbourhoodComputation(1000,10);
-    glEnable(GL_LIGHTING);
-    glLineWidth(1);
-    glDisable(GL_LIGHTING);
-
-    //render a couple of edges, with adjacent faces
-    //globalMesh.IllustrateEdges(100);
-
-    //render a couple of point to point connectivity
-    //globalMesh.IllustrateP2P_Neigh(100);
-
-    //render a couple of point to face connectivity
-    //globalMesh.IllustrateP2F_Neigh(300);
-
-    //render a couple of face to face connectivity
-    //globalMesh.IllustrateF2F_Neigh(100);
-
-    //renders obtuse triangles?
-    /*
-    for (int i=0; i<globalmesh.faces.size(); i++)
-    {
-        int dum = globalmesh.IsObtuse(i);
-        if ( dum != -1 )
-        {
-            //cout <<"OBTUSE AT:"<<dum<<endl;
-
-
-            Vector3d P(globalmesh.vertices[dum]);
-            glColor3f(double(i)/globalmesh.faces.size(),1-double(i)/globalmesh.faces.size(),0);
-            glPointSize(10);
-            glBegin(GL_POINTS);
-            glVertex3f(P[0], P[1], P[2]);
-            glEnd();
-
-            glColor3f(double(i)/globalmesh.faces.size(),1-double(i)/globalmesh.faces.size(),0);
-            glBegin(GL_TRIANGLES);
-            globalmesh.Draw_Face_Normal(i);
-            glEnd();
-        }
-    }
-    */
-    glEnable(GL_LIGHTING);
     //globalMesh.Draw(VERTEX_NORMAL_RGB);
     globalMesh.Draw(FACE_NORMAL_RGB);
-    int ngeod = 20;
-    timer.Reset();
-    timer.Start();
 
-    //globalMesh.IllustrateShortestPaths (ngeod, startpointindex);
-    timer.Stop();
-    cout<<"Geodesic construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
-
-    //globalMesh.DrawBoudaryEdges();
     glEndList();
 }
 
@@ -262,7 +215,7 @@ void myGLWidget::setFramesPerSecond(float fps)
 
 void myGLWidget::createLighting()
 {
-     //function to play around with open GL lights
+    //function to play around with open GL lights
     glEnable(GL_COLOR_MATERIAL);
 
     //roughly speaking : color of reflected light
@@ -320,15 +273,15 @@ void myGLWidget::Motion( int x ,int y)
 
     if(rotate)	{
 
-    current_position = TrackballMapping( x, y );  // Map the mouse position to a logical
+        current_position = TrackballMapping( x, y );  // Map the mouse position to a logical
 
-    //
-    // Rotate about the axis that is perpendicular to the great circle connecting the mouse movements.
-    //
+        //
+        // Rotate about the axis that is perpendicular to the great circle connecting the mouse movements.
+        //
 
-    rotation_axis = previous_trackball_position .cross ( current_position );
-    rotation_angle = 90.0 *( current_position - previous_trackball_position ).norm() * 1.5;
-    previous_trackball_position = current_position;
+        rotation_axis = previous_trackball_position .cross ( current_position );
+        rotation_angle = 90.0 *( current_position - previous_trackball_position ).norm() * 1.5;
+        previous_trackball_position = current_position;
     }
 
     if(translate){
@@ -347,83 +300,25 @@ void myGLWidget::Motion( int x ,int y)
 void myGLWidget::Mouse (QMouseEvent* event)
 {
     rotate=0;
-    if (event->buttons() && Qt::LeftButton) 	{
-        //if(state==Qt::Key_Down) {
-            rotate=1;
-            previous_trackball_position = TrackballMapping( event->x(), event->y() );
-        //}
-        //else rotate=0;
+    if (event->buttons() && Qt::LeftButton)
+    {
+        rotate=1;
+        previous_trackball_position = TrackballMapping( event->x(), event->y() );
     }
-    else if (event->buttons() && Qt::RightButton)	{
-        //if(state==Qt::Key_Down){
-            translate=1;
-            oldx = event->x();
-            oldy = event->y();
-        //}
-//        else{
-//            translate=0;
-//            oldx = x;
-//            oldy = y;
-//        }
-
+    else if (event->buttons() && Qt::RightButton)
+    {
+        translate=1;
+        oldx = event->x();
+        oldy = event->y();
     }
 }
 
 
-//void myGLWidget::Special(int key , int x ,int y)
-//{
-//    glMatrixMode(GL_PROJECTION);
-
-//    switch(key){
-//        case 100:translations[0] -= objectMove[0];
-
-//            break;
-//        case 101:translations[1] += objectMove[0];
-
-//            break;
-//        case 102:translations[0] += objectMove[1];
-
-//            break;
-//        case 103:translations[1] -= objectMove[1];
-
-//            break;
-//    }
-
-//    glMatrixMode(GL_MODELVIEW);
-//}
 
 
-//void myGLWidget::Keyboard(unsigned char key, int x , int y)
-//{
-
-//double gap=10.0;
-
-//switch(key)	{
-
-//    case 'f' :{
-//                glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-//                 }break;
-
-//    case 'l' :{
-//                glLineWidth(1.0);
-//                glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-//                 }break;
-
-//    case 'i' :{
-//                if(lights_on==0)lights_on=1;
-//                else lights_on=0;
-//                }break;
-
-//    case'+' :{translations[2] += objectMove[2];}break;
-//    case'-' :{translations[2] -= objectMove[2];}break;
-
-
-//    }
-//}
 
 void myGLWidget::display(void)
 {
-
     GLboolean lights_on[1];
     glGetBooleanv(GL_LIGHTING,lights_on);
 
@@ -479,14 +374,6 @@ void myGLWidget::display(void)
 
         glPopMatrix();
 
-    ///////
-    //
-    //	Display mesh stats
-    //
-    //////
-
-    //globalmesh.Print_Stats();
-
 
     ///////
     //
@@ -507,23 +394,14 @@ void myGLWidget::display(void)
     else glDisable(GL_LIGHTING);
     glCallList(id_globalmesh); // call the display list created in the main function
 
-//illustrate results for a point
-
-
-
+    //illustrate results for a point
     rotation_axis = Vector3d(0,0,0);
     rotation_angle = 0;
-    //glutSwapBuffers(); // forces refresh
 }
 
-void myGLWidget::mouseMotion(int x, int y)
-{
-    //Motion();
-}
 
 void myGLWidget::mouseMoveEvent(QMouseEvent * mouse)
 {
-    //Mouse(mouse);
     Motion(mouse->x(),mouse->y());
     updateGL();
 }
@@ -531,9 +409,7 @@ void myGLWidget::mouseMoveEvent(QMouseEvent * mouse)
 
 void myGLWidget::Draw_Color_Bar(int size_x, int size_y,int x_init,int y_init)
 {
-
     // store draw mode (light and polygon mode)
-
     GLint polygon_draw_mode[2];
     glGetIntegerv(GL_POLYGON_MODE,polygon_draw_mode);
 
@@ -661,11 +537,10 @@ void myGLWidget::MouseRelease(QMouseEvent* event)
 {
     if (event->buttons() && Qt::LeftButton)
     {
-
         rotate=0;
     }
-    else if ( event->buttons() && Qt::RightButton) {
-
+    else if ( event->buttons() && Qt::RightButton)
+    {
         translate=0;
         oldx = event->x();
         oldy = event->y();

@@ -1,0 +1,12 @@
+INPUT(
+./release\Camera.o
+./release\main.o
+./release\mainwindow.o
+./release\Mesh.o
+./release\myGLWidget.o
+./release\NeighborMesh.o
+./release\Scene.o
+./release\useful.o
+./release\moc_mainwindow.o
+./release\moc_myGLWidget.o
+);

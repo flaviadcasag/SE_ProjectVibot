@@ -17,7 +17,7 @@
 
 #include "useful.h"
 #include "constante.h"
-#include "scene.h"
+
 using namespace std;
 
 Vector3d DoubleToColor( const double d ){

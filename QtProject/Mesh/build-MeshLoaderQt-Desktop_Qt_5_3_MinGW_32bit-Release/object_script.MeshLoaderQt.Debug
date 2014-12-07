@@ -1,0 +1,12 @@
+INPUT(
+./debug\Camera.o
+./debug\main.o
+./debug\mainwindow.o
+./debug\Mesh.o
+./debug\myGLWidget.o
+./debug\NeighborMesh.o
+./debug\Scene.o
+./debug\useful.o
+./debug\moc_mainwindow.o
+./debug\moc_myGLWidget.o
+);

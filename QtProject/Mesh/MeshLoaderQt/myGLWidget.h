@@ -49,9 +49,8 @@ public:
     //Catch mouse movement
     void mouseMoveEvent(QMouseEvent * mouse);
 
+    //Catch mouse release
     void mouseReleaseEvent(QMouseEvent* mouse);
-
-
 
     //Set the window name
     void setName(string name);
@@ -96,11 +95,15 @@ private:
     //Trackball mapping
     static Vector3d TrackballMapping( int x, int y );
 
+    //Variable that controls if lights are on or not
     int lights_on;
+
+    //Variable to control old values of x and y of the mouse
     int oldx,oldy;
     float Current_Matrix[4][4];// = {{1,0,0,0}, {0,1,0,0}, {0,0,1,0}, {0,0,0,1}};
 
-    int rotate,translate;					// flag de rotation
+    // flag of rotation and translation
+    int rotate,translate;
     int Axis;
     int Axis_Id_List;
 
@@ -111,10 +114,10 @@ private:
     void display(void);
     void MouseRelease(QMouseEvent* event);
 
-    int                     window_width = 640;
-    int                     window_height = 480;
-    int                     window_number = 0;
-    double                  view_angle = 45;
+    int window_width = 640;
+    int window_height = 480;
+    int window_number = 0;
+    double view_angle = 45;
     Vector3d translations = Vector3d(0,0,0);
     Vector3d rotations = Vector3d(0,0,0);
     Vector2i previous_mouse_position = Vector2i(0,0);
@@ -122,7 +125,6 @@ private:
     Vector3d rotation_axis = Vector3d(0,0,0);
     double rotation_angle = 0;
     float trackball_transform[4][4] = {{1,0,0,0}, {0,1,0,0}, {0,0,1,0}, {0,0,0,1}};
-
 
     void Draw_Color_Bar(int size_x, int size_y,int x_init,int y_init);
     vector<Vector3d> Color_Steps; // for the color bar

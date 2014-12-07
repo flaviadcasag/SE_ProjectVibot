@@ -17,7 +17,6 @@
 #include "NeighborMesh.h"
 #include <GL/glut.h>
 #include <algorithm>
-#include "Scene.h"
 #include "useful.h"
 
 //constructor and destructor
@@ -45,7 +44,6 @@ NeighborMesh :: ~NeighborMesh(){}
 //}
 
 // construction of the various neighborhoods
-
 bool NeighborMesh :: Build_P2P_Neigh()
 {
     if ( vertices.empty() || faces.empty() ) return false;

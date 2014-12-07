@@ -4,18 +4,20 @@
 #
 #-------------------------------------------------
 
-#add opengl to QT config
-QT       += core opengl
+QT       += core gui opengl
 
-#We will see later how to have a gui interfaced opengl viewer
-QT       -= gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = MeshLoaderQt
+TEMPLATE = app
 
 #usual things
-TARGET = MeshLoaderQt
-CONFIG   += console
-CONFIG   -= app_bundle
+#TARGET = MeshLoaderQt
+#CONFIG   += console
+#CONFIG   -= app_bundle
+#CONFIG -= console
 
-TEMPLATE = app
+#TEMPLATE = app
 
 #add local sources and headers
 
@@ -26,7 +28,6 @@ SOURCES += \
     Mesh.cpp \
     myGLWidget.cpp \
     NeighborMesh.cpp \
-    Scene.cpp \
     useful.cpp
 
 HEADERS += \
@@ -36,7 +37,6 @@ HEADERS += \
     Mesh.h \
     myGLWidget.h \
     NeighborMesh.h \
-    scene.h \
     Stopwatch.h \
     useful.h
 
