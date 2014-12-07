@@ -19,18 +19,26 @@ TEMPLATE = app
 
 #add local sources and headers
 
-SOURCES +=  main.cpp\
-            Mesh.cpp\
-            NeighborMesh.cpp\
-            Scene.cpp\
-            Useful.cpp
+SOURCES += \
+    Camera.cpp \
+    main.cpp \
+    mainwindow.cpp \
+    Mesh.cpp \
+    myGLWidget.cpp \
+    NeighborMesh.cpp \
+    Scene.cpp \
+    useful.cpp
 
-HEADERS +=  Mesh.h\
-            NeighborMesh.h\
-            Scene.h\
-            Useful.h\
-            Constante.h\
-            Stopwatch.h
+HEADERS += \
+    Camera.h \
+    Constante.h \
+    mainwindow.h \
+    Mesh.h \
+    myGLWidget.h \
+    NeighborMesh.h \
+    scene.h \
+    Stopwatch.h \
+    useful.h
 
 
 #to include the GL and Eigen directories which are 3 directories above the current project directory
@@ -39,6 +47,9 @@ INCLUDEPATH += ..\..\..
 
 #to link the dlls
 LIBS += -lglut32 -lglu32 -lopengl32
+
+FORMS += \
+    mainwindow.ui
 
 
 

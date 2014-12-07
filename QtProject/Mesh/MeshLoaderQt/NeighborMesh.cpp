@@ -25,6 +25,25 @@
 NeighborMesh :: NeighborMesh(){}
 NeighborMesh :: ~NeighborMesh(){}
 
+//void NeighborMesh :: calcularEssaMerda()
+//{
+//    vector<Vector3d> delta;
+//    for (int i = 0; i < vertices.size(); i++)
+//    {
+//        Vector3d sum = Vector3d(0,0,0);
+//        for (int j = 0; j < P2P_Neigh.size(); j++)
+//            sum = sum + vertices[GetP2P_Neigh(i,j)];
+
+//        delta.push_back(vertices[i] - (1/(double)P2P_Neigh[i].size())*sum);
+//    }
+
+//    Matrix A(vertices.size(), vertices.size());
+//    for (int i = 0; i < vertices.size(); i++)
+//    {
+//        A(i,i) = P2P_Neigh[i].size();
+//    }
+//}
+
 // construction of the various neighborhoods
 
 bool NeighborMesh :: Build_P2P_Neigh()
@@ -77,7 +96,7 @@ void NeighborMesh :: DrawP2P_Neigh( int i )
     char s[255];
     sprintf(s, "%d", P2P_Neigh[i].size());
     string n(s);
-    Print3DMessage(0,0,n);
+    //Print3DMessage(0,0,n);
     glPopMatrix();
 
     glBegin(GL_POINTS);

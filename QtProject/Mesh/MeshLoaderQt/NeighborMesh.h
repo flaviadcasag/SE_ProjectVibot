@@ -43,6 +43,8 @@ class NeighborMesh : public Mesh
     NeighborMesh();
     virtual ~NeighborMesh();
 
+    void calcularEssaMerda();
+
     //attributes
 
     vector < set<int> > P2P_Neigh;
