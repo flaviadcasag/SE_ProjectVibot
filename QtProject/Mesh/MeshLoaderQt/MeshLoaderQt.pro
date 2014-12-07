@@ -26,19 +26,19 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     Mesh.cpp \
-    myGLWidget.cpp \
     NeighborMesh.cpp \
-    useful.cpp
+    useful.cpp \
+    GLWidget.cpp
 
 HEADERS += \
     Camera.h \
     Constante.h \
     mainwindow.h \
     Mesh.h \
-    myGLWidget.h \
     NeighborMesh.h \
     Stopwatch.h \
-    useful.h
+    useful.h \
+    GLWidget.h
 
 
 #to include the GL and Eigen directories which are 3 directories above the current project directory
