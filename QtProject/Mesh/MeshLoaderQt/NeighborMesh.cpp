@@ -747,7 +747,7 @@ int NeighborMesh :: IsObtuse(int f_index)
     return -1;
 }
 
-void NeighborMesh::smoothing()
+void NeighborMesh::smoothing(int frequency)
 {
 //    vector<Vector3d> smoothVertices;
 //    for (int i = 0; i < vertices.size();i++)
@@ -759,7 +759,6 @@ void NeighborMesh::smoothing()
 //            smoothVertices[i][2] = eVectors(i,j)/vertices[i][2];
 //        }
 //    }
-
     MatrixXd verticesMat(vertices.size(),3);
     MatrixXd alpha;
     for (int i = 0; i < vertices.size();i++)
@@ -771,7 +770,7 @@ void NeighborMesh::smoothing()
     }
 
     alpha=eVectors.inverse()*verticesMat;
-    int init = 10;
+    int init = frequency;
     for (int i = init; i < alpha.rows();i++)
     {
         for (int j = 0; j < alpha.cols();j++)
@@ -781,21 +780,31 @@ void NeighborMesh::smoothing()
     }
 
     MatrixXd smooth = eVectors*alpha;
+//    vertices.clear();
+//    for (int i = 0; i < vertices.size();i++)
+//    {
+//        Vector3d vert;
+//        for (int j = 0; j < 3;j++)
+//        {
+//            vert(j) = smooth(i,j);
+//        }
+//        vertices.push_back(vert);
+//    }
 
-    for (int i = 0; i < vertices.size();i++)
-    {
-        for (int j = 0; j < 3;j++)
+        for (int i = 0; i < vertices.size();i++)
         {
-            vertices[i][j]=smooth(i,j);
+            Vector3d vert;
+            for (int j = 0; j < 3;j++)
+            {
+                vertices[i][j] = smooth(i,j);
+            }
         }
-    }
 
     for (int i = 0; i < colors.size();i++)
     {
-        for (int j = 0; j < 3;j++)
-        {
-            colors[i][j]= 0.5;
-        }
+       colors[i][0]= 0;
+       colors[i][1]= 1;
+       colors[i][2]= 0;
     }
 
 

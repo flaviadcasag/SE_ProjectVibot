@@ -51,7 +51,7 @@ class NeighborMesh : public Mesh
     virtual ~NeighborMesh();
 
     void laplacian();
-    void smoothing();
+    void smoothing(int frequency);
 
     void SpectralDecomposition();
 

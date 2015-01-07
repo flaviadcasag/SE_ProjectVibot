@@ -75,7 +75,7 @@ public:
 
     NeighborMesh getGlobalMesh() {return globalMesh;}
 
-    void smoothMesh();
+    void smoothMesh(int frequency);
 
 public slots:
     void timeOutSlot();

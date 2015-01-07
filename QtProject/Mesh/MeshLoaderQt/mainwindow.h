@@ -31,6 +31,10 @@ private slots:
 
     void on_browseButton_clicked();
 
+    void on_horizontalSlider_2_actionTriggered(int action);
+
+    void on_horizontalSlider_2_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
 };

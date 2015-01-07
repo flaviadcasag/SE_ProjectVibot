@@ -629,9 +629,9 @@ void GLWidget::loadMesh(string filename)
     initMesh();
 }
 
-void GLWidget::smoothMesh()
+void GLWidget::smoothMesh(int frequency)
 {
-    globalMesh.smoothing();
+    globalMesh.smoothing(frequency);
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
