@@ -122,6 +122,8 @@ bool Mesh::ReadFile( const string& file_name )
 		return false;
 	}
 
+    ClearAll();
+
 	// Format extension string
 	string extension = UpperCase( file_name.substr( ++pos ) );
 

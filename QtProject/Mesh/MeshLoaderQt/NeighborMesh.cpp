@@ -15,33 +15,92 @@
  ***************************************************************************/
 
 #include "NeighborMesh.h"
-#include <GL/glut.h>
-#include <algorithm>
-#include "useful.h"
+#include <iostream>
 
 //constructor and destructor
 
 NeighborMesh :: NeighborMesh(){}
 NeighborMesh :: ~NeighborMesh(){}
 
-//void NeighborMesh :: calcularEssaMerda()
-//{
-//    vector<Vector3d> delta;
-//    for (int i = 0; i < vertices.size(); i++)
-//    {
-//        Vector3d sum = Vector3d(0,0,0);
-//        for (int j = 0; j < P2P_Neigh.size(); j++)
-//            sum = sum + vertices[GetP2P_Neigh(i,j)];
+void NeighborMesh :: laplacian()
+{
+    set<int>::iterator it;
+    ofstream out("p2p_neigh.txt");
+    ofstream Af("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/A.txt");
+    ofstream Df("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/D.txt");
+    ofstream Lf("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/Laplacian.txt");
+    for(int i=0; i< P2P_Neigh.size();i++)
+    {
+        for(it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
+        {
+            out<<(*it)<<" ";
+        }
+        out<<"\n";
+    }
+    out.close();
+    int N=P2P_Neigh.size();
+    MatrixXd A;
+    MatrixXd D;
+    A=MatrixXd::Zero(N,N);
+    D=MatrixXd::Zero(N,N);
+    set<int> neighp;
 
-//        delta.push_back(vertices[i] - (1/(double)P2P_Neigh[i].size())*sum);
+    for(int i=0;i<P2P_Neigh.size(); i++)
+    {
+        neighp = P2P_Neigh.at(i);
+        for(it=neighp.begin(); it != neighp.end();it++)
+        {
+            A(i,(*it))=1;
+        }
+        D(i,i)=neighp.size();
+    }
+    laplacianMatrix = D-A;
+
+    for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < N; j++)
+            {
+                Af << A(i,j) << " ";
+                Df << D(i,j) << " ";
+                Lf << laplacianMatrix(i,j) << " ";
+            }
+            Af << "\n";
+            Df << "\n";
+            Lf << "\n";
+        }
+
+        Af.close();
+        Df.close();
+        Lf.close();
+
+}
+
+void NeighborMesh :: SpectralDecomposition()
+{
+    SelfAdjointEigenSolver<MatrixXd> e(laplacianMatrix);
+    eValues = e.eigenvalues();
+    eVectors = e.eigenvectors();
+
+        ofstream laplaceEigenvalues("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/LapEigenValues.txt");
+        laplaceEigenvalues << eValues << "\n-------------------\n";
+        laplaceEigenvalues << eVectors << "\n-------------------\n";
+        laplaceEigenvalues.close();
+
+
+//    vector < pair<double,double> > eValVec;
+//    pair <double,double> p;
+//    ofstream laplaceEigenvalues("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/LapEigenValuesSorted.txt");
+//    for (int i=0;i = eValues.rows(); i++)
+//    {
+//        p = make_pair (eValues.coeff(i),eVectors.coeff(i));
+//        eValVec.push_back(p);
+//        laplaceEigenvalues << eValVec[i].first<< " " << eValVec[i].second <<  "\n";
 //    }
 
-//    Matrix A(vertices.size(), vertices.size());
-//    for (int i = 0; i < vertices.size(); i++)
-//    {
-//        A(i,i) = P2P_Neigh[i].size();
-//    }
-//}
+//   //laplaceEigenvalues << eVectors << "\n-------------------\n";
+//    laplaceEigenvalues.close();
+
+}
 
 // construction of the various neighborhoods
 bool NeighborMesh :: Build_P2P_Neigh()
@@ -449,6 +508,16 @@ void  NeighborMesh :: DrawBoudaryEdges()
     }
 }
 
+void NeighborMesh ::BuildSpectralLabels(int i)
+{
+    ofstream spectrallab("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/Lab.txt");
+    for(int j=0;j<eVectors.rows();j++){
+        spectrallab <<eVectors(j,i)<<endl;
+        Labels[j]=eVectors(j,i);
+    }
+    spectrallab.close();
+}
+
 void NeighborMesh ::BuildDistanceLabels(int A)
 {
     //first build an array to store the minimal distances to reach point i from A
@@ -676,5 +745,59 @@ int NeighborMesh :: IsObtuse(int f_index)
     }
 
     return -1;
+}
+
+void NeighborMesh::smoothing()
+{
+//    vector<Vector3d> smoothVertices;
+//    for (int i = 0; i < vertices.size();i++)
+//    {
+//        for (int j = 0; j < eVectors.cols();j++)
+//        {
+//            smoothVertices[i][0] = eVectors(i,j)/vertices[i][0];
+//            smoothVertices[i][1] = eVectors(i,j)/vertices[i][1];
+//            smoothVertices[i][2] = eVectors(i,j)/vertices[i][2];
+//        }
+//    }
+
+    MatrixXd verticesMat(vertices.size(),3);
+    MatrixXd alpha;
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            verticesMat(i,j)=vertices[i][j];
+        }
+    }
+
+    alpha=eVectors.inverse()*verticesMat;
+    int init = 10;
+    for (int i = init; i < alpha.rows();i++)
+    {
+        for (int j = 0; j < alpha.cols();j++)
+        {
+            alpha(i,j) = 0;
+        }
+    }
+
+    MatrixXd smooth = eVectors*alpha;
+
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            vertices[i][j]=smooth(i,j);
+        }
+    }
+
+    for (int i = 0; i < colors.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            colors[i][j]= 0.5;
+        }
+    }
+
+
 }
 
