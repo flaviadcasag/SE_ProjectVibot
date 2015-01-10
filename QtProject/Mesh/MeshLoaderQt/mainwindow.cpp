@@ -45,10 +45,32 @@ void MainWindow::on_browseButton_clicked()
     ui->horizontalSlider_2->setValue(ui->RenderingWidget->getGlobalMesh().VertexNumber()-1);
     QString s = QString::number(ui->horizontalSlider_2->value());
     ui->freqValue_2->setText(s);
+
+    ui->horizontalSlider_3->setMaximum(ui->RenderingWidget->getGlobalMesh().VertexNumber()-1);
+    s = QString::number(ui->horizontalSlider_3->value());
+    ui->freqValue_3->setText(s);
 }
 
 void MainWindow::on_horizontalSlider_2_valueChanged(int value)
 {
     QString s = QString::number(ui->horizontalSlider_2->value());
     ui->freqValue_2->setText(s);
+}
+
+void MainWindow::on_freqRemButton_clicked()
+{
+    ui->RenderingWidget->frequencyRemoval(ui->horizontalSlider_3->value());
+    QString s = QString::number(ui->horizontalSlider_3->value());
+    ui->freqValue_3->setText(s);
+}
+
+void MainWindow::on_horizontalSlider_3_valueChanged(int value)
+{
+    QString s = QString::number(ui->horizontalSlider_3->value());
+    ui->freqValue_3->setText(s);
+}
+
+void MainWindow::on_horizontalSlider_2_actionTriggered(int action)
+{
+
 }

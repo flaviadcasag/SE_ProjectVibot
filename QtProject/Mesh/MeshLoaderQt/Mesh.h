@@ -94,6 +94,10 @@ private:
         //display vertex and face numbers in the OpenGL window
 		void Print_Stats();
 
+
+        // Original Vertex array
+        vector<Vector3d> originalVertices;
+
 		// Vertex array
 		vector<Vector3d> vertices;
 

@@ -99,6 +99,7 @@ void NeighborMesh :: SpectralDecomposition()
 
 //   //laplaceEigenvalues << eVectors << "\n-------------------\n";
 //    laplaceEigenvalues.close();
+        originalVertices = vector<Vector3d>(vertices);
 
 }
 
@@ -749,23 +750,13 @@ int NeighborMesh :: IsObtuse(int f_index)
 
 void NeighborMesh::smoothing(int frequency)
 {
-//    vector<Vector3d> smoothVertices;
-//    for (int i = 0; i < vertices.size();i++)
-//    {
-//        for (int j = 0; j < eVectors.cols();j++)
-//        {
-//            smoothVertices[i][0] = eVectors(i,j)/vertices[i][0];
-//            smoothVertices[i][1] = eVectors(i,j)/vertices[i][1];
-//            smoothVertices[i][2] = eVectors(i,j)/vertices[i][2];
-//        }
-//    }
-    MatrixXd verticesMat(vertices.size(),3);
+    MatrixXd verticesMat(originalVertices.size(),3);
     MatrixXd alpha;
-    for (int i = 0; i < vertices.size();i++)
+    for (int i = 0; i < originalVertices.size();i++)
     {
         for (int j = 0; j < 3;j++)
         {
-            verticesMat(i,j)=vertices[i][j];
+            verticesMat(i,j)=originalVertices[i][j];
         }
     }
 
@@ -780,25 +771,14 @@ void NeighborMesh::smoothing(int frequency)
     }
 
     MatrixXd smooth = eVectors*alpha;
-//    vertices.clear();
-//    for (int i = 0; i < vertices.size();i++)
-//    {
-//        Vector3d vert;
-//        for (int j = 0; j < 3;j++)
-//        {
-//            vert(j) = smooth(i,j);
-//        }
-//        vertices.push_back(vert);
-//    }
 
-        for (int i = 0; i < vertices.size();i++)
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
         {
-            Vector3d vert;
-            for (int j = 0; j < 3;j++)
-            {
-                vertices[i][j] = smooth(i,j);
-            }
+            vertices[i][j] = smooth(i,j);
         }
+    }
 
     for (int i = 0; i < colors.size();i++)
     {
@@ -808,5 +788,41 @@ void NeighborMesh::smoothing(int frequency)
     }
 
 
+}
+
+void NeighborMesh::frequencyRemoval(int frequency)
+{
+    MatrixXd verticesMat(originalVertices.size(),3);
+    MatrixXd alpha;
+    for (int i = 0; i < originalVertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            verticesMat(i,j)=originalVertices[i][j];
+        }
+    }
+
+    alpha=eVectors.inverse()*verticesMat;
+        for (int j = 0; j < alpha.cols();j++)
+        {
+            alpha(frequency,j) = 0;
+        }
+
+    MatrixXd removal = eVectors*alpha;
+
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            vertices[i][j] = removal(i,j);
+        }
+    }
+
+    for (int i = 0; i < colors.size();i++)
+    {
+       colors[i][0]= 0;
+       colors[i][1]= 1;
+       colors[i][2]= 0;
+    }
 }
 

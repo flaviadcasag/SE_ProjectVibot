@@ -77,6 +77,9 @@ public:
 
     void smoothMesh(int frequency);
 
+    void frequencyRemoval(int frequency);
+
+
 public slots:
     void timeOutSlot();
 

@@ -98,10 +98,11 @@ void GLWidget::initMesh()
     //activate / disable those and compare ;)
     glEnable( GL_POINT_SMOOTH );
     glHint( GL_POINT_SMOOTH, GL_NICEST );
-    //example on How To Use the timer
-    timer.Reset();
-    timer.Start();
 
+
+
+    timer.Reset();
+    timer.Start();  
     //load a mesh from a file
     //string file_name ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/mannequin.wrl");
     if (!globalMesh.ReadFile(fileName)) exit(0);
@@ -626,12 +627,25 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 void GLWidget::loadMesh(string filename)
 {
     fileName = filename;
+    globalMesh = NeighborMesh();
     initMesh();
 }
 
 void GLWidget::smoothMesh(int frequency)
 {
     globalMesh.smoothing(frequency);
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    globalMesh.Draw(FACE_NORMAL_RGB);
+    glEndList();
+
+
+    updateGL();
+}
+
+void GLWidget::frequencyRemoval(int frequency)
+{
+    globalMesh.frequencyRemoval(frequency);
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
