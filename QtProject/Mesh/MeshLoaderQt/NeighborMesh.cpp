@@ -15,11 +15,15 @@
  ***************************************************************************/
 
 #include "NeighborMesh.h"
+<<<<<<< HEAD
 #include <GL/glut.h>
 #include <algorithm>
 #include "useful.h"
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
+=======
+#include <iostream>
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
 using namespace Eigen;
 //constructor and destructor
@@ -27,23 +31,277 @@ using namespace Eigen;
 NeighborMesh :: NeighborMesh(){}
 NeighborMesh :: ~NeighborMesh(){}
 
+<<<<<<< HEAD
 void NeighborMesh :: graphLaplacian()
 {
 //    vector<Vector3d> delta;
 //    for (int i = 0; i < vertices.size(); i++)
-//    {
-//        Vector3d sum = Vector3d(0,0,0);
-//        for (int j = 0; j < P2P_Neigh.size(); j++)
-//            sum = sum + vertices[GetP2P_Neigh(i,j)];
+=======
+void NeighborMesh :: laplacian()
+{
+    set<int>::iterator it;
+    ofstream out("p2p_neigh.txt");
+    ofstream Af("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/A.txt");
+    ofstream Df("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/D.txt");
+    ofstream Lf("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/Laplacian.txt");
+    for(int i=0; i< P2P_Neigh.size();i++)
+    {
+        for(it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
+        {
+            out<<(*it)<<" ";
+        }
+        out<<"\n";
+    }
+    out.close();
+    int N=P2P_Neigh.size();
+    MatrixXd A;
+    MatrixXd D;
+    A=MatrixXd::Zero(N,N);
+    D=MatrixXd::Zero(N,N);
+    set<int> neighp;
 
-//        delta.push_back(vertices[i] - (1/(double)P2P_Neigh[i].size())*sum);
-//    }
+    for(int i=0;i<P2P_Neigh.size(); i++)
+    {
+        neighp = P2P_Neigh.at(i);
+        for(it=neighp.begin(); it != neighp.end();it++)
+        {
+            A(i,(*it))=1;
+        }
+        D(i,i)=neighp.size();
+    }
+    laplacianMatrix = D-A;
 
-//    Matrix A(vertices.size(), vertices.size());
-//    for (int i = 0; i < vertices.size(); i++)
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            Af << A(i,j) << " ";
+            Df << D(i,j) << " ";
+            Lf << laplacianMatrix(i,j) << " ";
+        }
+        Af << "\n";
+        Df << "\n";
+        Lf << "\n";
+    }
+
+    Af.close();
+    Df.close();
+    Lf.close();
+
+}
+
+double cot(double i) { return(1 / tan(i)); }
+
+MatrixXd NeighborMesh::computeWeight()
+{
+    int N = vertices.size();
+    MatrixXd W = MatrixXd::Zero(N,N);
+    int face[2];
+    set<int> intersect;
+    set<int>::iterator it;
+    set<int>::iterator it2;
+    for (int i = 0; i < N; i++)
+    {
+        set<int> currentP2P = P2P_Neigh[i];
+        int cc = 0;
+        int ms = currentP2P.size();
+        for (it = currentP2P.begin(); it != currentP2P.end(); it++)
+        {
+            int j = (*it);
+            if (cc < ms)
+            {
+                cout << i <<" "<< j<< endl;
+                cc++;
+            }
+                //        set<int> asda2 = P2P_Neigh[j];
+
+            set<int> faces1 = P2F_Neigh[i];
+            set<int> faces2 = P2F_Neigh[j];
+        intersect.clear();
+            set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
+                              std::inserter(intersect,intersect.begin()));
+            if (intersect.size() != 2)
+            {
+                W(i,j) = 0;
+            }
+            else
+            {
+
+                int cnt = 0;
+                for (it2 = intersect.begin(); it2 != intersect.end(); ++it2)
+                {
+                    face[cnt++] = (*it2);
+                }
+                int u = 0;
+                int v = 0;
+                for (int l = 0; l < 3; l++)
+                {
+                    if (faces[face[0]][l] != i && faces[face[0]][l] != j)
+                    {
+                        u = faces[face[0]][l];
+                    }
+                }
+                for (int l = 0; l < 3; l++)
+                {
+                    if (faces[face[1]][l] != i && faces[face[1]][l] != j)
+                    {
+                        v = faces[face[1]][l];
+                    }
+                }
+                Vector3d vec1 = vertices[u] - vertices[i];
+                Vector3d vec2 = vertices[u] - vertices[j];
+                Vector3d vec3 = vertices[v] - vertices[i];
+                Vector3d vec4 = vertices[v] - vertices[j];
+
+                double alpha = acos(vec1.dot(vec2)/(vec1.norm() * vec2.norm()));
+                double beta = acos(vec3.dot(vec4)/(vec3.norm() * vec4.norm()));
+                W(i,j) = cot(alpha) + cot(beta);
+            }
+        }
+    }
+    return W;
+}
+
+//MatrixXd NeighborMesh::computeWeight()
+//{
+//    int N = vertices.size();
+//    MatrixXd W = MatrixXd::Zero(N,N);
+//    int face[2];
+//    set<int> intersect;
+//    set<int>::iterator it;
+//    for (int i = 0; i < N; i++)
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 //    {
-//        A(i,i) = P2P_Neigh[i].size();
+//        for (int j = 0; j < N; j++)
+//        {
+//            if (i==j)
+//            {
+//                W(i,j)=0;
+//            }
+//            else
+//            {
+//                    //        set<int> asda2 = P2P_Neigh[j];
+
+//                set<int> faces1 = P2F_Neigh[i];
+//                set<int> faces2 = P2F_Neigh[j];
+
+//                set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
+//                                  std::inserter(intersect,intersect.begin()));
+//                if (intersect.size() != 2)
+//                {
+//                    W(i,j) = 0;
+//                }
+//                else
+//                {
+
+//                    int cnt = 0;
+//                    for (it = intersect.begin(); it != intersect.end(); ++it)
+//                    {
+//                        face[cnt++] = (*it);
+//                    }
+//                    int u = 0;
+//                    int v = 0;
+//                    for (int l = 0; l < 3; l++)
+//                    {
+//                        if (faces[face[0]][l] != i && faces[face[0]][l] != j)
+//                        {
+//                            u = faces[face[0]][l];
+//                        }
+//                    }
+//                    for (int l = 0; l < 3; l++)
+//                    {
+//                        if (faces[face[1]][l] != i && faces[face[1]][l] != j)
+//                        {
+//                            v = faces[face[1]][l];
+//                        }
+//                    }
+//                    Vector3d vec1 = vertices[u] - vertices[i];
+//                    Vector3d vec2 = vertices[u] - vertices[j];
+//                    Vector3d vec3 = vertices[v] - vertices[i];
+//                    Vector3d vec4 = vertices[v] - vertices[j];
+
+//                    double alpha = acos(vec1.dot(vec2)/(vec1.norm() * vec2.norm()));
+//                    double beta = acos(vec3.dot(vec4)/(vec3.norm() * vec4.norm()));
+//                    W(i,j) = cot(alpha) + cot(beta);
+//                }
+//            }
+//        }
 //    }
+//    return W;
+//}
+
+void NeighborMesh :: weightedLaplacian()
+{
+    set<int>::iterator it;
+    MatrixXd W = computeWeight();
+    ofstream out("p2p_neigh.txt");
+    ofstream Af("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WA.txt");
+    ofstream Df("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WD.txt");
+    ofstream Lf("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WLaplacian.txt");
+    for(int i=0; i< P2P_Neigh.size();i++)
+    {
+        for(it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
+        {
+            out<<(*it)<<" ";
+        }
+        out<<"\n";
+    }
+    out.close();
+    int N=P2P_Neigh.size();
+    MatrixXd A;
+    MatrixXd D;
+    A=MatrixXd::Zero(N,N);
+    D=MatrixXd::Zero(N,N);
+    set<int> neighp;
+
+    for(int i=0;i<P2P_Neigh.size(); i++)
+    {
+        neighp = P2P_Neigh.at(i);
+        D(i,i)=W.row(i).sum();
+    }
+    laplacianMatrix = D-W;
+
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            Af << A(i,j) << " ";
+            Df << D(i,j) << " ";
+            Lf << laplacianMatrix(i,j) << " ";
+        }
+        Af << "\n";
+        Df << "\n";
+        Lf << "\n";
+    }
+
+    Af.close();
+    Df.close();
+    Lf.close();
+
+}
+
+void NeighborMesh :: SpectralDecomposition()
+{
+    SelfAdjointEigenSolver<MatrixXd> e(laplacianMatrix);
+    eValues = e.eigenvalues();
+    eVectors = e.eigenvectors();
+
+        ofstream laplaceEigenvalues("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/LapEigenValues.txt");
+        laplaceEigenvalues << eValues << "\n-------------------\n";
+        laplaceEigenvalues << eVectors << "\n-------------------\n";
+        laplaceEigenvalues.close();
+
+
+//    vector < pair<double,double> > eValVec;
+//    pair <double,double> p;
+//    ofstream laplaceEigenvalues("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/LapEigenValuesSorted.txt");
+//    for (int i=0;i = eValues.rows(); i++)
+//    {
+//        p = make_pair (eValues.coeff(i),eVectors.coeff(i));
+//        eValVec.push_back(p);
+//        laplaceEigenvalues << eValVec[i].first<< " " << eValVec[i].second <<  "\n";
+//    }
+<<<<<<< HEAD
     set<int>::iterator it;
     ofstream out("p2p_neigh.txt");
     for (int i = 0; i < P2P_Neigh.size(); i++)
@@ -110,6 +368,13 @@ void NeighborMesh :: graphLaplacian()
     laplaceEigenvalues << laplacianEigenValues << " ";
 
     laplaceEigenvalues.close();
+=======
+
+//   //laplaceEigenvalues << eVectors << "\n-------------------\n";
+//    laplaceEigenvalues.close();
+        originalVertices = vector<Vector3d>(vertices);
+
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 }
 
 // construction of the various neighborhoods
@@ -518,6 +783,16 @@ void  NeighborMesh :: DrawBoudaryEdges()
     }
 }
 
+void NeighborMesh ::BuildSpectralLabels(int i)
+{
+    ofstream spectrallab("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/Lab.txt");
+    for(int j=0;j<eVectors.rows();j++){
+        spectrallab <<eVectors(j,i)<<endl;
+        Labels[j]=eVectors(j,i);
+    }
+    spectrallab.close();
+}
+
 void NeighborMesh ::BuildDistanceLabels(int A)
 {
     //first build an array to store the minimal distances to reach point i from A
@@ -745,5 +1020,83 @@ int NeighborMesh :: IsObtuse(int f_index)
     }
 
     return -1;
+}
+
+void NeighborMesh::smoothing(int frequency)
+{
+    MatrixXd verticesMat(originalVertices.size(),3);
+    MatrixXd alpha;
+    for (int i = 0; i < originalVertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            verticesMat(i,j)=originalVertices[i][j];
+        }
+    }
+
+    alpha=eVectors.inverse()*verticesMat;
+    int init = frequency;
+    for (int i = init; i < alpha.rows();i++)
+    {
+        for (int j = 0; j < alpha.cols();j++)
+        {
+            alpha(i,j) = 0;
+        }
+    }
+
+    MatrixXd smooth = eVectors*alpha;
+
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            vertices[i][j] = smooth(i,j);
+        }
+    }
+
+    for (int i = 0; i < colors.size();i++)
+    {
+       colors[i][0]= 0;
+       colors[i][1]= 1;
+       colors[i][2]= 0;
+    }
+
+
+}
+
+void NeighborMesh::frequencyRemoval(int frequency)
+{
+    MatrixXd verticesMat(originalVertices.size(),3);
+    MatrixXd alpha;
+    for (int i = 0; i < originalVertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            verticesMat(i,j)=originalVertices[i][j];
+        }
+    }
+
+    alpha=eVectors.inverse()*verticesMat;
+        for (int j = 0; j < alpha.cols();j++)
+        {
+            alpha(frequency,j) = 0;
+        }
+
+    MatrixXd removal = eVectors*alpha;
+
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            vertices[i][j] = removal(i,j);
+        }
+    }
+
+    for (int i = 0; i < colors.size();i++)
+    {
+       colors[i][0]= 0;
+       colors[i][1]= 1;
+       colors[i][2]= 0;
+    }
 }
 

@@ -11,6 +11,7 @@
 #include "Stopwatch.h"
 #include "Camera.h"
 #include "Constante.h"
+#include <iostream>
 
 using namespace std;
 
@@ -22,9 +23,14 @@ class GLWidget : public QGLWidget
 
 public:
 
+    string fileName;
+
+
     //explicit constructor
     explicit GLWidget(QWidget *parent = 0);
 
+
+    void initMesh();
 
     /*observe the virtual ... =0 notation for some functions*/
 
@@ -57,6 +63,22 @@ public:
 
     //Set frames per second
     void setFramesPerSecond(float fps);
+
+    //Load mesh
+    void loadMesh(string filename);
+
+    //Calculate the spectrum
+    void calculateSpectrum(int frequency);
+
+    //Color the spectrum
+    void colorSpectrum(int);
+
+    NeighborMesh getGlobalMesh() {return globalMesh;}
+
+    void smoothMesh(int frequency);
+
+    void frequencyRemoval(int frequency);
+
 
 public slots:
     void timeOutSlot();

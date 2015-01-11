@@ -122,6 +122,8 @@ bool Mesh::ReadFile( const string& file_name )
 		return false;
 	}
 
+    ClearAll();
+
 	// Format extension string
 	string extension = UpperCase( file_name.substr( ++pos ) );
 
@@ -410,9 +412,6 @@ void Mesh::Print_Stats()
 	sprintf(s,"Faces   : %d", faces.size());
     //PrintMessage( 10, 10, s );
 	sprintf(s,"Vertices: %d", vertices.size());
-    //PrintMessage( 10, 25, s );
-    //sprintf(s,"ASDASDASDAS");
-    //PrintMessage( 10, 40, s );
 
 	//add any information you want to display as text in the OGL window here
 

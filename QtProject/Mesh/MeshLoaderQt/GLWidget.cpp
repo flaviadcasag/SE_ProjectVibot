@@ -58,7 +58,15 @@ void GLWidget::initializeGL()
     Color_Steps.push_back(COL_RED);
 
     setWindowTitle(QString(name.c_str()));
+    glClearColor(1,1,1,1);
+    //fileName = ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/dolphin.wrl");
+    //initMesh();
 
+}
+
+
+void GLWidget::initMesh()
+{
     // set the drawing mode to full rendering
     glPolygonMode(GL_FRONT,GL_FILL);
 
@@ -91,17 +99,22 @@ void GLWidget::initializeGL()
     glEnable( GL_POINT_SMOOTH );
     glHint( GL_POINT_SMOOTH, GL_NICEST );
 
-    //example on How To Use the timer
-    timer.Reset();
-    timer.Start();
 
+
+    timer.Reset();
+    timer.Start();  
     //load a mesh from a file
+<<<<<<< HEAD
     string file_name ("../../../VRML/dolphin.wrl");
     if (!globalMesh.ReadFile(file_name))
     {
         cout << "EQWASD" << endl;
         exit(0);
     }
+=======
+    //string file_name ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/mannequin.wrl");
+    if (!globalMesh.ReadFile(fileName)) exit(0);
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
     timer.Stop();
     cout<<"Loading time :"<< timer.GetTotal()/1000.0<<" s"<<endl;
@@ -159,6 +172,7 @@ void GLWidget::initializeGL()
     // consider the mesh as a graph and run shortest path algo
     // then stores distances in the label array
     globalMesh.BuildDistanceLabels(startpointindex);
+
     timer.Stop();
     cout<<"Distance label construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
 
@@ -179,6 +193,62 @@ void GLWidget::initializeGL()
     globalMesh.graphLaplacian();
 
     glEndList();
+
+    resizeGL(width(),height());
+    updateGL();
+}
+
+void GLWidget::calculateSpectrum(int frequency)
+{
+    cout << "Laplacian starts now..." << endl;
+    //Laplacian Calculation
+    //globalMesh.laplacian();
+    globalMesh.weightedLaplacian();
+
+    timer.Reset();
+    timer.Start();
+    globalMesh.SpectralDecomposition();
+    timer.Stop();
+    cout<<"Finish calculating spectral decomposition :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+
+//    timer.Reset();
+//    timer.Start();
+    globalMesh.BuildSpectralLabels(frequency);
+//    timer.Stop();
+//    cout<<"Building colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+
+//    timer.Reset();
+//    timer.Start();
+    globalMesh.SetColorsFromLabels();
+//    timer.Stop();
+//    cout<<"Setting colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    globalMesh.Draw(FACE_NORMAL_RGB);
+    glEndList();
+
+
+    updateGL();
+}
+
+void GLWidget::colorSpectrum(int value)
+{
+    timer.Reset();
+    timer.Start();
+    globalMesh.BuildSpectralLabels(value);
+    timer.Stop();
+    cout<<"Building colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    timer.Reset();
+    timer.Start();
+    globalMesh.SetColorsFromLabels();
+    timer.Stop();
+    cout<<"Setting colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    globalMesh.Draw(FACE_NORMAL_RGB);
+    glEndList();
+    updateGL();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -567,5 +637,35 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
     updateGL();
 }
 
+void GLWidget::loadMesh(string filename)
+{
+    fileName = filename;
+    globalMesh = NeighborMesh();
+    initMesh();
+}
+
+void GLWidget::smoothMesh(int frequency)
+{
+    globalMesh.smoothing(frequency);
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    globalMesh.Draw(FACE_NORMAL_RGB);
+    glEndList();
+
+
+    updateGL();
+}
+
+void GLWidget::frequencyRemoval(int frequency)
+{
+    globalMesh.frequencyRemoval(frequency);
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    globalMesh.Draw(FACE_NORMAL_RGB);
+    glEndList();
+
+
+    updateGL();
+}
 
 

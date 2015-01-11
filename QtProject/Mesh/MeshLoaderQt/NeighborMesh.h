@@ -31,8 +31,19 @@ using namespace Eigen;
 #include <vector>
 #include <set>
 #include <map>
+<<<<<<< HEAD
 #include <iostream>
 #include <fstream>
+=======
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <GL/glut.h>
+#include <algorithm>
+#include "useful.h"
+#include <iostream>
+#include <cmath>
+
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 using namespace std;
 
 #include "Mesh.h"
@@ -45,7 +56,18 @@ class NeighborMesh : public Mesh
     NeighborMesh();
     virtual ~NeighborMesh();
 
+<<<<<<< HEAD
     void graphLaplacian();
+=======
+
+    void laplacian();
+    void weightedLaplacian();
+    void smoothing(int frequency);
+    void frequencyRemoval(int frequency);
+    MatrixXd computeWeight();
+
+    void SpectralDecomposition();
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
     //attributes
 
@@ -70,6 +92,7 @@ class NeighborMesh : public Mesh
     bool Build_F2F_Neigh();
     bool Build_Edges();
     void BuildDistanceLabels(int A);
+    void BuildSpectralLabels( int i);
 
     //rendering functions for verification
 

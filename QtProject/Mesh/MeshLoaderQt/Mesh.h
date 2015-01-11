@@ -30,6 +30,7 @@ using namespace Eigen;
 #include <cassert>
 #include <cstring>
 #include <vector>
+#include <QObject>
 using namespace std;
 
 //--
@@ -79,7 +80,7 @@ extern string UpperCase( const string& s );
 //--
 class Mesh
 {
-
+private:
 	//--
 	//
 	// Member Data
@@ -90,8 +91,13 @@ class Mesh
 	// feel free to change from public to private/protected if you want
 
 	public:
+
         //display vertex and face numbers in the OpenGL window
 		void Print_Stats();
+
+
+        // Original Vertex array
+        vector<Vector3d> originalVertices;
 
 		// Vertex array
 		vector<Vector3d> vertices;
@@ -111,17 +117,31 @@ class Mesh
 		// Vertex normal array
 		vector<Vector3d> vertex_normals;
 
+        //Eigen values
+        MatrixXd eValues;
+
+        //Eigen Vectors
+        MatrixXd eVectors;
+
+        //Laplacian Matrix
+        MatrixXd laplacianMatrix;
+
 		// Texture file name ... probably useless for you in this project
 		string texture_name;
 
 		// Color binding (per vertex or per face)
 		AttributeBinding color_binding;
 
+<<<<<<< HEAD
         //Store the laplacian Eiven vectors
         MatrixXd laplacianEigenVectors;
 
         //Store the laplacian Eiven vectors
         MatrixXd laplacianEigenValues;
+=======
+        //Get EigenVectors
+        MatrixXd getEigenVectors() {return eVectors;}
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
 
     //--
