@@ -180,8 +180,8 @@ void GLWidget::initMesh()
     //globalMesh.Draw(VERTEX_NORMAL_RGB);
     globalMesh.Draw(FACE_NORMAL_RGB);
 
-
     glEndList();
+
     resizeGL(width(),height());
     updateGL();
 }
@@ -190,7 +190,8 @@ void GLWidget::calculateSpectrum(int frequency)
 {
     cout << "Laplacian starts now..." << endl;
     //Laplacian Calculation
-    globalMesh.laplacian();
+    //globalMesh.laplacian();
+    globalMesh.weightedLaplacian();
 
     timer.Reset();
     timer.Start();

@@ -37,6 +37,7 @@ using namespace Eigen;
 #include <algorithm>
 #include "useful.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -52,8 +53,10 @@ class NeighborMesh : public Mesh
 
 
     void laplacian();
+    void weightedLaplacian();
     void smoothing(int frequency);
     void frequencyRemoval(int frequency);
+    MatrixXd computeWeight();
 
     void SpectralDecomposition();
 

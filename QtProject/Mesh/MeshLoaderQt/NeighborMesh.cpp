@@ -57,21 +57,210 @@ void NeighborMesh :: laplacian()
     laplacianMatrix = D-A;
 
     for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
         {
-            for (int j = 0; j < N; j++)
-            {
-                Af << A(i,j) << " ";
-                Df << D(i,j) << " ";
-                Lf << laplacianMatrix(i,j) << " ";
-            }
-            Af << "\n";
-            Df << "\n";
-            Lf << "\n";
+            Af << A(i,j) << " ";
+            Df << D(i,j) << " ";
+            Lf << laplacianMatrix(i,j) << " ";
         }
+        Af << "\n";
+        Df << "\n";
+        Lf << "\n";
+    }
 
-        Af.close();
-        Df.close();
-        Lf.close();
+    Af.close();
+    Df.close();
+    Lf.close();
+
+}
+
+double cot(double i) { return(1 / tan(i)); }
+
+MatrixXd NeighborMesh::computeWeight()
+{
+    int N = vertices.size();
+    MatrixXd W = MatrixXd::Zero(N,N);
+    int face[2];
+    set<int> intersect;
+    set<int>::iterator it;
+    set<int>::iterator it2;
+    for (int i = 0; i < N; i++)
+    {
+        set<int> currentP2P = P2P_Neigh[i];
+        int cc = 0;
+        int ms = currentP2P.size();
+        for (it = currentP2P.begin(); it != currentP2P.end(); it++)
+        {
+            int j = (*it);
+            if (cc < ms)
+            {
+                cout << i <<" "<< j<< endl;
+                cc++;
+            }
+                //        set<int> asda2 = P2P_Neigh[j];
+
+            set<int> faces1 = P2F_Neigh[i];
+            set<int> faces2 = P2F_Neigh[j];
+        intersect.clear();
+            set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
+                              std::inserter(intersect,intersect.begin()));
+            if (intersect.size() != 2)
+            {
+                W(i,j) = 0;
+            }
+            else
+            {
+
+                int cnt = 0;
+                for (it2 = intersect.begin(); it2 != intersect.end(); ++it2)
+                {
+                    face[cnt++] = (*it2);
+                }
+                int u = 0;
+                int v = 0;
+                for (int l = 0; l < 3; l++)
+                {
+                    if (faces[face[0]][l] != i && faces[face[0]][l] != j)
+                    {
+                        u = faces[face[0]][l];
+                    }
+                }
+                for (int l = 0; l < 3; l++)
+                {
+                    if (faces[face[1]][l] != i && faces[face[1]][l] != j)
+                    {
+                        v = faces[face[1]][l];
+                    }
+                }
+                Vector3d vec1 = vertices[u] - vertices[i];
+                Vector3d vec2 = vertices[u] - vertices[j];
+                Vector3d vec3 = vertices[v] - vertices[i];
+                Vector3d vec4 = vertices[v] - vertices[j];
+
+                double alpha = acos(vec1.dot(vec2)/(vec1.norm() * vec2.norm()));
+                double beta = acos(vec3.dot(vec4)/(vec3.norm() * vec4.norm()));
+                W(i,j) = cot(alpha) + cot(beta);
+            }
+        }
+    }
+    return W;
+}
+
+//MatrixXd NeighborMesh::computeWeight()
+//{
+//    int N = vertices.size();
+//    MatrixXd W = MatrixXd::Zero(N,N);
+//    int face[2];
+//    set<int> intersect;
+//    set<int>::iterator it;
+//    for (int i = 0; i < N; i++)
+//    {
+//        for (int j = 0; j < N; j++)
+//        {
+//            if (i==j)
+//            {
+//                W(i,j)=0;
+//            }
+//            else
+//            {
+//                    //        set<int> asda2 = P2P_Neigh[j];
+
+//                set<int> faces1 = P2F_Neigh[i];
+//                set<int> faces2 = P2F_Neigh[j];
+
+//                set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
+//                                  std::inserter(intersect,intersect.begin()));
+//                if (intersect.size() != 2)
+//                {
+//                    W(i,j) = 0;
+//                }
+//                else
+//                {
+
+//                    int cnt = 0;
+//                    for (it = intersect.begin(); it != intersect.end(); ++it)
+//                    {
+//                        face[cnt++] = (*it);
+//                    }
+//                    int u = 0;
+//                    int v = 0;
+//                    for (int l = 0; l < 3; l++)
+//                    {
+//                        if (faces[face[0]][l] != i && faces[face[0]][l] != j)
+//                        {
+//                            u = faces[face[0]][l];
+//                        }
+//                    }
+//                    for (int l = 0; l < 3; l++)
+//                    {
+//                        if (faces[face[1]][l] != i && faces[face[1]][l] != j)
+//                        {
+//                            v = faces[face[1]][l];
+//                        }
+//                    }
+//                    Vector3d vec1 = vertices[u] - vertices[i];
+//                    Vector3d vec2 = vertices[u] - vertices[j];
+//                    Vector3d vec3 = vertices[v] - vertices[i];
+//                    Vector3d vec4 = vertices[v] - vertices[j];
+
+//                    double alpha = acos(vec1.dot(vec2)/(vec1.norm() * vec2.norm()));
+//                    double beta = acos(vec3.dot(vec4)/(vec3.norm() * vec4.norm()));
+//                    W(i,j) = cot(alpha) + cot(beta);
+//                }
+//            }
+//        }
+//    }
+//    return W;
+//}
+
+void NeighborMesh :: weightedLaplacian()
+{
+    set<int>::iterator it;
+    MatrixXd W = computeWeight();
+    ofstream out("p2p_neigh.txt");
+    ofstream Af("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WA.txt");
+    ofstream Df("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WD.txt");
+    ofstream Lf("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WLaplacian.txt");
+    for(int i=0; i< P2P_Neigh.size();i++)
+    {
+        for(it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
+        {
+            out<<(*it)<<" ";
+        }
+        out<<"\n";
+    }
+    out.close();
+    int N=P2P_Neigh.size();
+    MatrixXd A;
+    MatrixXd D;
+    A=MatrixXd::Zero(N,N);
+    D=MatrixXd::Zero(N,N);
+    set<int> neighp;
+
+    for(int i=0;i<P2P_Neigh.size(); i++)
+    {
+        neighp = P2P_Neigh.at(i);
+        D(i,i)=W.row(i).sum();
+    }
+    laplacianMatrix = D-W;
+
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            Af << A(i,j) << " ";
+            Df << D(i,j) << " ";
+            Lf << laplacianMatrix(i,j) << " ";
+        }
+        Af << "\n";
+        Df << "\n";
+        Lf << "\n";
+    }
+
+    Af.close();
+    Df.close();
+    Lf.close();
 
 }
 

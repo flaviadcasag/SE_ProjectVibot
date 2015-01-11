@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>936</width>
-    <height>542</height>
+    <width>934</width>
+    <height>751</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>10</y>
       <width>541</width>
-      <height>471</height>
+      <height>691</height>
      </rect>
     </property>
    </widget>
@@ -106,7 +106,7 @@
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>350</y>
+      <y>560</y>
       <width>341</width>
       <height>131</height>
      </rect>
@@ -116,7 +116,7 @@
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>330</y>
+      <y>540</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -164,13 +164,104 @@
      <string>0</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>390</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frequency</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="freqRemButton">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>340</y>
+      <width>221</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frequency Removal</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="horizontalSlider_3">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>410</y>
+      <width>341</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>190</y>
+      <width>371</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>320</y>
+      <width>571</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_3">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>50</y>
+      <width>371</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="freqValue_3">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>390</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>936</width>
+     <width>934</width>
      <height>21</height>
     </rect>
    </property>
