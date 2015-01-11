@@ -96,8 +96,12 @@ void GLWidget::initializeGL()
     timer.Start();
 
     //load a mesh from a file
-    string file_name ("../../../VRML/david.wrl");
-    if (!globalMesh.ReadFile(file_name)) exit(0);
+    string file_name ("../../../VRML/dolphin.wrl");
+    if (!globalMesh.ReadFile(file_name))
+    {
+        cout << "EQWASD" << endl;
+        exit(0);
+    }
 
     timer.Stop();
     cout<<"Loading time :"<< timer.GetTotal()/1000.0<<" s"<<endl;
@@ -169,7 +173,10 @@ void GLWidget::initializeGL()
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     //globalMesh.Draw(VERTEX_NORMAL_RGB);
-    globalMesh.Draw(FACE_NORMAL_RGB);
+    //globalMesh.Draw(FACE_NORMAL_RGB);
+    globalMesh.Draw(LAPLACIAN);
+
+    globalMesh.graphLaplacian();
 
     glEndList();
 }

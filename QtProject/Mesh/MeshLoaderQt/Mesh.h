@@ -24,6 +24,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
 using namespace Eigen;
 
 #include <cassert>
@@ -116,6 +117,12 @@ class Mesh
 		// Color binding (per vertex or per face)
 		AttributeBinding color_binding;
 
+        //Store the laplacian Eiven vectors
+        MatrixXd laplacianEigenVectors;
+
+        //Store the laplacian Eiven vectors
+        MatrixXd laplacianEigenValues;
+
 
     //--
 	//
@@ -129,6 +136,7 @@ class Mesh
 		void Draw_Face_Normal_Rgb(int i);
 		void Draw_Vertex_Normal(int);
 		void Draw_Vertex_Normal_Rgb(int);
+        void Draw_Laplacian(int);
 
 
 		//--

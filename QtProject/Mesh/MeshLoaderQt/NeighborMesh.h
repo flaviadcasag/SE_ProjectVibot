@@ -31,6 +31,8 @@ using namespace Eigen;
 #include <vector>
 #include <set>
 #include <map>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 #include "Mesh.h"
@@ -43,7 +45,7 @@ class NeighborMesh : public Mesh
     NeighborMesh();
     virtual ~NeighborMesh();
 
-    void calcularEssaMerda();
+    void graphLaplacian();
 
     //attributes
 

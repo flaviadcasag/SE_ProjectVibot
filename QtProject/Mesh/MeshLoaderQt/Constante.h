@@ -29,6 +29,7 @@
 #define FACE_NORMAL_RGB				1000200
 #define VERTEX_NORMAL				1000300
 #define VERTEX_NORMAL_RGB			1000400
+#define LAPLACIAN       			1000500
 
 
 

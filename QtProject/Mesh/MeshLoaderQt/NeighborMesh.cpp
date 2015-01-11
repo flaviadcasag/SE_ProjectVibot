@@ -18,14 +18,17 @@
 #include <GL/glut.h>
 #include <algorithm>
 #include "useful.h"
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 
+using namespace Eigen;
 //constructor and destructor
 
 NeighborMesh :: NeighborMesh(){}
 NeighborMesh :: ~NeighborMesh(){}
 
-//void NeighborMesh :: calcularEssaMerda()
-//{
+void NeighborMesh :: graphLaplacian()
+{
 //    vector<Vector3d> delta;
 //    for (int i = 0; i < vertices.size(); i++)
 //    {
@@ -41,7 +44,73 @@ NeighborMesh :: ~NeighborMesh(){}
 //    {
 //        A(i,i) = P2P_Neigh[i].size();
 //    }
-//}
+    set<int>::iterator it;
+    ofstream out("p2p_neigh.txt");
+    for (int i = 0; i < P2P_Neigh.size(); i++)
+    {
+        for (it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
+        {
+            out << (*it)<< " ";
+        }
+        out << "\n";
+    }
+
+    out.close();
+    int N = P2P_Neigh.size();
+    MatrixXd A;
+    MatrixXd D;
+    A=MatrixXd::Zero(N,N);
+    D=MatrixXd::Zero(N,N);
+    ofstream Af("A.txt");
+    ofstream Df("D.txt");
+    ofstream Lf("Lap.txt");
+    set<int> neighp;
+    for (int i = 0; i < P2P_Neigh.size(); i++)
+    {
+        neighp = P2P_Neigh.at(i);
+        for (it = neighp.begin(); it != neighp.end(); it++)
+        {
+            A(i,(*it)) = 1;
+        }
+        D(i,i) = neighp.size();
+    }
+
+    //Symmetric Lapacian Matrix
+    MatrixXd Laplacian = D-A;
+
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            Af << A(i,j) << " ";
+            Df << D(i,j) << " ";
+            Lf << Laplacian(i,j) << " ";
+        }
+        Af << "\n";
+        Df << "\n";
+        Lf << "\n";
+    }
+
+    Af.close();
+    Df.close();
+    Lf.close();
+
+    EigenSolver<MatrixXd> eigenValues(Laplacian);
+
+    ofstream laplaceEigenvalues("LapEigenValues.txt");
+    MatrixXcd Va = eigenValues.eigenvalues();
+    MatrixXcd Ve = eigenValues.eigenvectors();
+    //laplaceEigenvalues << Va << "\n-------------------\n";
+    //laplaceEigenvalues << Va.rows() << "\n-------------------\n";
+    //laplaceEigenvalues << Ve << " ";
+
+    laplacianEigenVectors = Ve.col(0);
+    laplaceEigenvalues << laplacianEigenVectors << "\n-------------------\n";
+    laplacianEigenValues = Va.real();
+    laplaceEigenvalues << laplacianEigenValues << " ";
+
+    laplaceEigenvalues.close();
+}
 
 // construction of the various neighborhoods
 bool NeighborMesh :: Build_P2P_Neigh()

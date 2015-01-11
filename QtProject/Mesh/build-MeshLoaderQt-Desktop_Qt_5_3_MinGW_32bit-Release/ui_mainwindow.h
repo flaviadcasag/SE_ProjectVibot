@@ -16,10 +16,11 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
-#include <myglwidget.h>
+#include <GLWidget.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -27,7 +28,8 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralWidget;
-    myGLWidget *RenderingWidget;
+    GLWidget *RenderingWidget;
+    QPushButton *pushButton;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -39,9 +41,12 @@ public:
         MainWindow->resize(936, 673);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        RenderingWidget = new myGLWidget(centralWidget);
+        RenderingWidget = new GLWidget(centralWidget);
         RenderingWidget->setObjectName(QStringLiteral("RenderingWidget"));
         RenderingWidget->setGeometry(QRect(40, 30, 711, 451));
+        pushButton = new QPushButton(centralWidget);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setGeometry(QRect(790, 50, 75, 23));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -62,6 +67,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "Laplacian", 0));
     } // retranslateUi
 
 };
