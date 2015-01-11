@@ -21,7 +21,10 @@ public:
     ~MainWindow();
 
 
+
+
 private slots:
+
 
     void on_SpecButton_clicked();
 
@@ -39,8 +42,17 @@ private slots:
 
     void on_horizontalSlider_3_valueChanged(int value);
 
+    void on_graphLap_clicked();
+
+    void on_geoLap_clicked();
+
+    void on_SpecButton_2_clicked();
+
+    void on_SpecButton_3_clicked();
+
 private:
     Ui::MainWindow *ui;
+    bool isLapCalculated;
 };
 
 #endif // MAINWINDOW_H

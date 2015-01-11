@@ -93,16 +93,10 @@ MatrixXd NeighborMesh::computeWeight()
         for (it = currentP2P.begin(); it != currentP2P.end(); it++)
         {
             int j = (*it);
-            if (cc < ms)
-            {
-                cout << i <<" "<< j<< endl;
-                cc++;
-            }
-                //        set<int> asda2 = P2P_Neigh[j];
 
             set<int> faces1 = P2F_Neigh[i];
             set<int> faces2 = P2F_Neigh[j];
-        intersect.clear();
+            intersect.clear();
             set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
                               std::inserter(intersect,intersect.begin()));
             if (intersect.size() != 2)

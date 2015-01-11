@@ -109,6 +109,8 @@ void GLWidget::initMesh()
 
     timer.Stop();
     cout<<"Loading time :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    //MainWindow.setConsoleText('oi');
+
 
     //construct P2P : point to point connectivity
     timer.Reset();
@@ -186,12 +188,13 @@ void GLWidget::initMesh()
     updateGL();
 }
 
-void GLWidget::calculateSpectrum(int frequency)
+void GLWidget::calculateSpectrum(int frequency,bool flag)
 {
     cout << "Laplacian starts now..." << endl;
     //Laplacian Calculation
     //globalMesh.laplacian();
-    globalMesh.weightedLaplacian();
+    if (flag == false) globalMesh.weightedLaplacian();
+    else globalMesh.laplacian();
 
     timer.Reset();
     timer.Start();
@@ -639,8 +642,6 @@ void GLWidget::smoothMesh(int frequency)
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
     glEndList();
-
-
     updateGL();
 }
 
@@ -651,8 +652,6 @@ void GLWidget::frequencyRemoval(int frequency)
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
     glEndList();
-
-
     updateGL();
 }
 

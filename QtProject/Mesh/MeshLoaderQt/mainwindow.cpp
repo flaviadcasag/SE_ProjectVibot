@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->horizontalSlider_2->setValue(ui->horizontalSlider_2->maximum());
     QString s = QString::number(ui->horizontalSlider_2->value());
     ui->freqValue_2->setText(s);
+    isLapCalculated = false;
 }
 
 MainWindow::~MainWindow()
@@ -19,7 +20,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_SpecButton_clicked()
 {
-    ui->RenderingWidget->calculateSpectrum(ui->horizontalSlider->value());
+    //flag = 0 , geolap
+    bool flag;
+    if (ui->graphLap->isChecked()) flag = true;
+    else flag = false;
+    ui->RenderingWidget->calculateSpectrum(ui->horizontalSlider->value(),flag);
+    isLapCalculated = true;
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int value)
@@ -31,13 +37,12 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 
 void MainWindow::on_smoothButton_clicked()
 {
-    ui->RenderingWidget->smoothMesh(ui->horizontalSlider_2->value());
-    QString s = QString::number(ui->horizontalSlider_2->value());
-    ui->freqValue_2->setText(s);
 }
 
 void MainWindow::on_browseButton_clicked()
 {
+    isLapCalculated = false;
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",tr("VRML File (*.wrl)"));
     ui->RenderingWidget->loadMesh(fileName.toStdString());
     ui->horizontalSlider->setMaximum(ui->RenderingWidget->getGlobalMesh().VertexNumber()-1);
@@ -53,24 +58,63 @@ void MainWindow::on_browseButton_clicked()
 
 void MainWindow::on_horizontalSlider_2_valueChanged(int value)
 {
-    QString s = QString::number(ui->horizontalSlider_2->value());
+    if (isLapCalculated)
+    {
+        ui->RenderingWidget->smoothMesh(value);
+    }
+    QString s = QString::number(value);
     ui->freqValue_2->setText(s);
 }
 
 void MainWindow::on_freqRemButton_clicked()
 {
-    ui->RenderingWidget->frequencyRemoval(ui->horizontalSlider_3->value());
-    QString s = QString::number(ui->horizontalSlider_3->value());
-    ui->freqValue_3->setText(s);
 }
 
 void MainWindow::on_horizontalSlider_3_valueChanged(int value)
 {
-    QString s = QString::number(ui->horizontalSlider_3->value());
+    if (isLapCalculated)
+    {
+        ui->RenderingWidget->frequencyRemoval(value);
+    }
+    QString s = QString::number(value);
     ui->freqValue_3->setText(s);
 }
 
 void MainWindow::on_horizontalSlider_2_actionTriggered(int action)
 {
-
 }
+
+void MainWindow::on_graphLap_clicked()
+{
+    ui->graphLap->setChecked(false);
+}
+
+void MainWindow::on_geoLap_clicked()
+{
+    ui->graphLap->setChecked(false);
+}
+
+void MainWindow::on_SpecButton_2_clicked()
+{
+    if (!isLapCalculated)
+    {
+        bool flag;
+        if (ui->graphLap->isChecked()) flag = true;
+        else flag = false;
+        ui->RenderingWidget->calculateSpectrum(ui->horizontalSlider->value(),flag);
+        isLapCalculated = true;
+    }
+}
+
+void MainWindow::on_SpecButton_3_clicked()
+{
+    if (!isLapCalculated)
+    {
+        bool flag;
+        if (ui->graphLap->isChecked()) flag = true;
+        else flag = false;
+        ui->RenderingWidget->calculateSpectrum(ui->horizontalSlider->value(),flag);
+        isLapCalculated = true;
+    }
+}
+

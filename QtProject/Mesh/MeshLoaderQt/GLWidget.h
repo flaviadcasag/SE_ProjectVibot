@@ -4,6 +4,7 @@
 #include <QtOpenGL>
 #include <QGLWidget>
 #include <GL/glu.h>
+#include <iostream>
 
 #include <string>
 
@@ -11,7 +12,7 @@
 #include "Stopwatch.h"
 #include "Camera.h"
 #include "Constante.h"
-#include <iostream>
+
 
 using namespace std;
 
@@ -68,7 +69,7 @@ public:
     void loadMesh(string filename);
 
     //Calculate the spectrum
-    void calculateSpectrum(int frequency);
+    void calculateSpectrum(int frequency, bool flag);
 
     //Color the spectrum
     void colorSpectrum(int);
