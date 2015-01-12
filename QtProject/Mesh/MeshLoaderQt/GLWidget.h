@@ -69,7 +69,7 @@ public:
     void loadMesh(string filename);
 
     //Calculate the spectrum
-    void calculateSpectrum(int frequency, bool flag);
+    void calculateSpectrum(int frequency);
 
     //Color the spectrum
     void colorSpectrum(int);
@@ -79,6 +79,12 @@ public:
     void smoothMesh(int frequency);
 
     void frequencyRemoval(int frequency);
+
+    void meshEdit(double size, int axis);
+
+    void computeLaplacian(int mode);
+
+    void setLog(QTextEdit* log) {this->log = log;}
 
 
 public slots:
@@ -151,6 +157,9 @@ private:
 
     void Draw_Color_Bar(int size_x, int size_y,int x_init,int y_init);
     vector<Vector3d> Color_Steps; // for the color bar
+
+    //Log
+    QTextEdit* log;
 
 };
 

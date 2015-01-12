@@ -20,10 +20,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-<<<<<<< HEAD
-private slots:
-    void on_pushButton_clicked();
-=======
 
 
 
@@ -45,7 +41,6 @@ private slots:
     void on_freqRemButton_clicked();
 
     void on_horizontalSlider_3_valueChanged(int value);
->>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
     void on_graphLap_clicked();
 
@@ -55,9 +50,19 @@ private slots:
 
     void on_SpecButton_3_clicked();
 
+    void on_ComputeLaplacianButton_clicked();
+
+    void on_horizontalSlider_4_valueChanged(int value);
+
+    void on_meshx_clicked();
+
+    void on_meshy_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool isLapCalculated;
+    bool isSpectralComputed;
+
 };
 
 #endif // MAINWINDOW_H

@@ -15,28 +15,13 @@
  ***************************************************************************/
 
 #include "NeighborMesh.h"
-<<<<<<< HEAD
-#include <GL/glut.h>
-#include <algorithm>
-#include "useful.h"
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
-=======
 #include <iostream>
->>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
-using namespace Eigen;
 //constructor and destructor
 
 NeighborMesh :: NeighborMesh(){}
 NeighborMesh :: ~NeighborMesh(){}
 
-<<<<<<< HEAD
-void NeighborMesh :: graphLaplacian()
-{
-//    vector<Vector3d> delta;
-//    for (int i = 0; i < vertices.size(); i++)
-=======
 void NeighborMesh :: laplacian()
 {
     set<int>::iterator it;
@@ -156,74 +141,6 @@ MatrixXd NeighborMesh::computeWeight()
     return W;
 }
 
-//MatrixXd NeighborMesh::computeWeight()
-//{
-//    int N = vertices.size();
-//    MatrixXd W = MatrixXd::Zero(N,N);
-//    int face[2];
-//    set<int> intersect;
-//    set<int>::iterator it;
-//    for (int i = 0; i < N; i++)
->>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
-//    {
-//        for (int j = 0; j < N; j++)
-//        {
-//            if (i==j)
-//            {
-//                W(i,j)=0;
-//            }
-//            else
-//            {
-//                    //        set<int> asda2 = P2P_Neigh[j];
-
-//                set<int> faces1 = P2F_Neigh[i];
-//                set<int> faces2 = P2F_Neigh[j];
-
-//                set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
-//                                  std::inserter(intersect,intersect.begin()));
-//                if (intersect.size() != 2)
-//                {
-//                    W(i,j) = 0;
-//                }
-//                else
-//                {
-
-//                    int cnt = 0;
-//                    for (it = intersect.begin(); it != intersect.end(); ++it)
-//                    {
-//                        face[cnt++] = (*it);
-//                    }
-//                    int u = 0;
-//                    int v = 0;
-//                    for (int l = 0; l < 3; l++)
-//                    {
-//                        if (faces[face[0]][l] != i && faces[face[0]][l] != j)
-//                        {
-//                            u = faces[face[0]][l];
-//                        }
-//                    }
-//                    for (int l = 0; l < 3; l++)
-//                    {
-//                        if (faces[face[1]][l] != i && faces[face[1]][l] != j)
-//                        {
-//                            v = faces[face[1]][l];
-//                        }
-//                    }
-//                    Vector3d vec1 = vertices[u] - vertices[i];
-//                    Vector3d vec2 = vertices[u] - vertices[j];
-//                    Vector3d vec3 = vertices[v] - vertices[i];
-//                    Vector3d vec4 = vertices[v] - vertices[j];
-
-//                    double alpha = acos(vec1.dot(vec2)/(vec1.norm() * vec2.norm()));
-//                    double beta = acos(vec3.dot(vec4)/(vec3.norm() * vec4.norm()));
-//                    W(i,j) = cot(alpha) + cot(beta);
-//                }
-//            }
-//        }
-//    }
-//    return W;
-//}
-
 void NeighborMesh :: weightedLaplacian()
 {
     set<int>::iterator it;
@@ -295,80 +212,11 @@ void NeighborMesh :: SpectralDecomposition()
 //        eValVec.push_back(p);
 //        laplaceEigenvalues << eValVec[i].first<< " " << eValVec[i].second <<  "\n";
 //    }
-<<<<<<< HEAD
-    set<int>::iterator it;
-    ofstream out("p2p_neigh.txt");
-    for (int i = 0; i < P2P_Neigh.size(); i++)
-    {
-        for (it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
-        {
-            out << (*it)<< " ";
-        }
-        out << "\n";
-    }
-
-    out.close();
-    int N = P2P_Neigh.size();
-    MatrixXd A;
-    MatrixXd D;
-    A=MatrixXd::Zero(N,N);
-    D=MatrixXd::Zero(N,N);
-    ofstream Af("A.txt");
-    ofstream Df("D.txt");
-    ofstream Lf("Lap.txt");
-    set<int> neighp;
-    for (int i = 0; i < P2P_Neigh.size(); i++)
-    {
-        neighp = P2P_Neigh.at(i);
-        for (it = neighp.begin(); it != neighp.end(); it++)
-        {
-            A(i,(*it)) = 1;
-        }
-        D(i,i) = neighp.size();
-    }
-
-    //Symmetric Lapacian Matrix
-    MatrixXd Laplacian = D-A;
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            Af << A(i,j) << " ";
-            Df << D(i,j) << " ";
-            Lf << Laplacian(i,j) << " ";
-        }
-        Af << "\n";
-        Df << "\n";
-        Lf << "\n";
-    }
-
-    Af.close();
-    Df.close();
-    Lf.close();
-
-    EigenSolver<MatrixXd> eigenValues(Laplacian);
-
-    ofstream laplaceEigenvalues("LapEigenValues.txt");
-    MatrixXcd Va = eigenValues.eigenvalues();
-    MatrixXcd Ve = eigenValues.eigenvectors();
-    //laplaceEigenvalues << Va << "\n-------------------\n";
-    //laplaceEigenvalues << Va.rows() << "\n-------------------\n";
-    //laplaceEigenvalues << Ve << " ";
-
-    laplacianEigenVectors = Ve.col(0);
-    laplaceEigenvalues << laplacianEigenVectors << "\n-------------------\n";
-    laplacianEigenValues = Va.real();
-    laplaceEigenvalues << laplacianEigenValues << " ";
-
-    laplaceEigenvalues.close();
-=======
 
 //   //laplaceEigenvalues << eVectors << "\n-------------------\n";
 //    laplaceEigenvalues.close();
-        originalVertices = vector<Vector3d>(vertices);
 
->>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
+
 }
 
 // construction of the various neighborhoods
@@ -1019,7 +867,7 @@ int NeighborMesh :: IsObtuse(int f_index)
 void NeighborMesh::smoothing(int frequency)
 {
     MatrixXd verticesMat(originalVertices.size(),3);
-    MatrixXd alpha;
+    MatrixXd delta;
     for (int i = 0; i < originalVertices.size();i++)
     {
         for (int j = 0; j < 3;j++)
@@ -1028,17 +876,17 @@ void NeighborMesh::smoothing(int frequency)
         }
     }
 
-    alpha=eVectors.inverse()*verticesMat;
+    delta=eVectors.inverse()*verticesMat;
     int init = frequency;
-    for (int i = init; i < alpha.rows();i++)
+    for (int i = init; i < delta.rows();i++)
     {
-        for (int j = 0; j < alpha.cols();j++)
+        for (int j = 0; j < delta.cols();j++)
         {
-            alpha(i,j) = 0;
+            delta(i,j) = 0;
         }
     }
 
-    MatrixXd smooth = eVectors*alpha;
+    MatrixXd smooth = eVectors*delta;
 
     for (int i = 0; i < vertices.size();i++)
     {
@@ -1061,7 +909,7 @@ void NeighborMesh::smoothing(int frequency)
 void NeighborMesh::frequencyRemoval(int frequency)
 {
     MatrixXd verticesMat(originalVertices.size(),3);
-    MatrixXd alpha;
+    MatrixXd delta;
     for (int i = 0; i < originalVertices.size();i++)
     {
         for (int j = 0; j < 3;j++)
@@ -1070,13 +918,13 @@ void NeighborMesh::frequencyRemoval(int frequency)
         }
     }
 
-    alpha=eVectors.inverse()*verticesMat;
-        for (int j = 0; j < alpha.cols();j++)
-        {
-            alpha(frequency,j) = 0;
-        }
+    delta=eVectors.inverse()*verticesMat;
+    for (int j = 0; j < delta.cols();j++)
+    {
+        delta(frequency,j) = 0;
+    }
 
-    MatrixXd removal = eVectors*alpha;
+    MatrixXd removal = eVectors*delta;
 
     for (int i = 0; i < vertices.size();i++)
     {
@@ -1092,5 +940,55 @@ void NeighborMesh::frequencyRemoval(int frequency)
        colors[i][1]= 1;
        colors[i][2]= 0;
     }
+}
+
+void NeighborMesh::meshEditing(double size, int axis)
+{
+
+    int getMin = 0;
+    int getMax = 0;
+    Vector3d sizes(1,1,1);
+    sizes[axis] = size;
+
+    getMax = maxs[axis];
+    getMin = mins[axis];
+
+    MatrixXd verticesMat(originalVertices.size(),3);
+    MatrixXd delta;
+    for (int i = 0; i < originalVertices.size();i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            verticesMat(i,j)=originalVertices[i][j];
+        }
+    }
+
+    delta=laplacianMatrix*verticesMat;
+
+    MatrixXd laplacianAnchors(laplacianMatrix.rows()+2, laplacianMatrix.cols());
+    MatrixXd B;
+    B = MatrixXd::Zero(2,laplacianMatrix.cols());
+    B(0,getMin) = 1;
+    B(1,getMax) = 1;
+    laplacianAnchors << laplacianMatrix, B;
+
+    MatrixXd deltaAnchors(delta.rows()+2, delta.cols());
+
+    MatrixXd C(2,3);
+    C(0,0) = verticesMat(getMin,0); C(0,1) = verticesMat(getMin,1); C(0,2) = verticesMat(getMin,2);
+    C(1,0) = verticesMat(getMax,0)*sizes[0]; C(1,1) = verticesMat(getMax,1)*sizes[1]; C(1,2) = verticesMat(getMax,2)*sizes[2];
+
+    deltaAnchors << delta,C;
+
+    MatrixXd newVertices = (laplacianAnchors.transpose()*laplacianAnchors).inverse()*laplacianAnchors.transpose()*deltaAnchors;
+
+    for (int i = 0; i < vertices.size();i++)
+    {
+        for (int j = 0; j < 3;j++)
+        {
+            vertices[i][j] = newVertices(i,j);
+        }
+    }
+
 }
 

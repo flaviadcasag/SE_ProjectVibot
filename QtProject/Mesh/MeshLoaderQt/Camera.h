@@ -17,7 +17,7 @@ public:
     Vector3d getPosition();
 
     //Init camera and return the distance from the camera to the object
-    double initCamera(const NeighborMesh& mesh);
+    double initCamera(NeighborMesh& mesh);
 
     double getZnear ();
     double getZfar ();

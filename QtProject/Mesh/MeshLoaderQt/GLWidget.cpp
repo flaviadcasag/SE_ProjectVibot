@@ -59,9 +59,6 @@ void GLWidget::initializeGL()
 
     setWindowTitle(QString(name.c_str()));
     glClearColor(1,1,1,1);
-    //fileName = ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/dolphin.wrl");
-    //initMesh();
-
 }
 
 
@@ -104,50 +101,42 @@ void GLWidget::initMesh()
     timer.Reset();
     timer.Start();  
     //load a mesh from a file
-<<<<<<< HEAD
-    string file_name ("../../../VRML/dolphin.wrl");
-    if (!globalMesh.ReadFile(file_name))
-    {
-        cout << "EQWASD" << endl;
-        exit(0);
-    }
-=======
     //string file_name ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/mannequin.wrl");
     if (!globalMesh.ReadFile(fileName)) exit(0);
->>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
     timer.Stop();
-    cout<<"Loading time :"<< timer.GetTotal()/1000.0<<" s"<<endl;
-    //MainWindow.setConsoleText('oi');
+    log->append("Loading time :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
+
+    globalMesh.originalVertices = vector<Vector3d>(globalMesh.vertices);
 
     //construct P2P : point to point connectivity
     timer.Reset();
     timer.Start();
     globalMesh.Build_P2P_Neigh();
     timer.Stop();
-    cout<<"P2P construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("P2P construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     //construct P2F : point to face connectivity
     timer.Reset();
     timer.Start();
     globalMesh.Build_P2F_Neigh();
     timer.Stop();
-    cout<<"P2F construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("P2F construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     //construct F2F : face to face connectivity
     timer.Reset();
     timer.Start();
     globalMesh.Build_F2F_Neigh();
     timer.Stop();
-    cout<<"F2F construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("F2F construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     //construct Edges
     timer.Reset();
     timer.Start();
     globalMesh.Build_Edges();
     timer.Stop();
-    cout<<"Egdes construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("Egdes construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     //Init camera parameters based on the globalMesh
     double distance = cam.initCamera(globalMesh);
@@ -176,23 +165,19 @@ void GLWidget::initMesh()
     globalMesh.BuildDistanceLabels(startpointindex);
 
     timer.Stop();
-    cout<<"Distance label construction :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("Distance label construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     //construct colors from labels
     timer.Reset();
     timer.Start();
     globalMesh.SetColorsFromLabels();
     timer.Stop();
-    cout<<"Constructing colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("Constructing colors from distance :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     //ok now here render
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    //globalMesh.Draw(VERTEX_NORMAL_RGB);
-    //globalMesh.Draw(FACE_NORMAL_RGB);
-    globalMesh.Draw(LAPLACIAN);
-
-    globalMesh.graphLaplacian();
+    globalMesh.Draw(FACE_NORMAL_RGB);
 
     glEndList();
 
@@ -200,53 +185,29 @@ void GLWidget::initMesh()
     updateGL();
 }
 
-void GLWidget::calculateSpectrum(int frequency,bool flag)
+void GLWidget::calculateSpectrum(int frequency)
 {
-    cout << "Laplacian starts now..." << endl;
-    //Laplacian Calculation
-    //globalMesh.laplacian();
-    if (flag == false) globalMesh.weightedLaplacian();
-    else globalMesh.laplacian();
-
+    log->append("Laplacian calculation starts now");
     timer.Reset();
     timer.Start();
     globalMesh.SpectralDecomposition();
     timer.Stop();
-    cout<<"Finish calculating spectral decomposition :"<< timer.GetTotal()/1000.0<<" s"<<endl;
+    log->append("Finish calculating spectral decomposition :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
-//    timer.Reset();
-//    timer.Start();
     globalMesh.BuildSpectralLabels(frequency);
-//    timer.Stop();
-//    cout<<"Building colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
-
-//    timer.Reset();
-//    timer.Start();
     globalMesh.SetColorsFromLabels();
-//    timer.Stop();
-//    cout<<"Setting colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
-
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
     glEndList();
-
-
     updateGL();
 }
 
 void GLWidget::colorSpectrum(int value)
 {
-    timer.Reset();
-    timer.Start();
+    log->append("Selecting different frequencies for spectral decomposition");
     globalMesh.BuildSpectralLabels(value);
-    timer.Stop();
-    cout<<"Building colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
-    timer.Reset();
-    timer.Start();
     globalMesh.SetColorsFromLabels();
-    timer.Stop();
-    cout<<"Setting colors from distance :"<< timer.GetTotal()/1000.0<<" s"<<endl;
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
@@ -322,9 +283,6 @@ void GLWidget::createLighting()
 
     //activate the first light
     glEnable(GL_LIGHT0);
-
-    //-- if you want to add more lights, up to 8 lights are possible
-    //-- insert similar code here
 }
 
 Vector3d GLWidget::TrackballMapping( int x, int y )
@@ -392,9 +350,6 @@ void GLWidget::Mouse (QMouseEvent* event)
         oldy = event->y();
     }
 }
-
-
-
 
 
 void GLWidget::display(void)
@@ -624,7 +579,6 @@ void GLWidget::MouseRelease(QMouseEvent* event)
         translate=0;
         oldx = event->x();
         oldy = event->y();
-
     }
 }
 
@@ -667,4 +621,33 @@ void GLWidget::frequencyRemoval(int frequency)
     updateGL();
 }
 
+void GLWidget::meshEdit(double size, int axis)
+{
+    globalMesh.meshEditing(size, axis);
+
+    //Init camera parameters based on the globalMesh
+    double distance = cam.initCamera(globalMesh);
+
+    //adjust displacements consequently
+    objectMove[0] = distance/20;
+    objectMove[1] = distance/20;
+    objectMove[2] = distance/20;
+
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    globalMesh.Draw(FACE_NORMAL_RGB);
+    glEndList();
+
+    resizeGL(width(), height());
+    updateGL();
+}
+
+void GLWidget::computeLaplacian(int mode)
+{
+    switch (mode)
+    {
+        case 1 : globalMesh.laplacian(); break;
+        case 2 : globalMesh.weightedLaplacian(); break;
+    }
+}
 

@@ -15,22 +15,37 @@ Vector3d Camera::getPosition()
     return position;
 }
 
-double Camera::initCamera(const NeighborMesh& mesh)
+double Camera::initCamera(NeighborMesh& mesh)
 {
     //roughly adjust view frustrum to object and camera position
     Vector3d Pmin(mesh.vertices[0]), Pmax(mesh.vertices[0]);
     Vector3d Center(0,0,0);
-
+    Vector3d mins = Vector3d(0,0,0);
+    Vector3d maxs = Vector3d(0,0,0);
     for( int i=0; i< mesh.vertices.size(); i++)
     {
         Vector3d P(mesh.vertices[i]);
         for( int j=0; j<2; j++)
         {
-            Pmin[j] = min(Pmin[j],P[j]);
-            Pmax[j] = max(Pmax[j],P[j]);
+            if (P[j] < Pmin[j])
+            {
+                Pmin[j] = P[j];
+                mins[j] = i;
+            }
+
+            if (P[j] > Pmax[j])
+            {
+                Pmax[j] = P[j];
+                maxs[j] = i;
+            }
+            //Pmin[j] = min(Pmin[j],P[j]);
+            //Pmax[j] = max(Pmax[j],P[j]);
         }
         Center += P;
     }
+
+    mesh.setMaxs(maxs);
+    mesh.setMins(mins);
 
     Center/=mesh.vertices.size();
     target = Center;
