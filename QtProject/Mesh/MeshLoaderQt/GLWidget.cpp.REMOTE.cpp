@@ -104,22 +104,11 @@ void GLWidget::initMesh()
     timer.Reset();
     timer.Start();  
     //load a mesh from a file
-<<<<<<< HEAD
-    string file_name ("../../../VRML/dolphin.wrl");
-    if (!globalMesh.ReadFile(file_name))
-    {
-        cout << "EQWASD" << endl;
-        exit(0);
-    }
-=======
     //string file_name ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/mannequin.wrl");
     if (!globalMesh.ReadFile(fileName)) exit(0);
->>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
     timer.Stop();
     cout<<"Loading time :"<< timer.GetTotal()/1000.0<<" s"<<endl;
-    //MainWindow.setConsoleText('oi');
-
 
     //construct P2P : point to point connectivity
     timer.Reset();
@@ -189,10 +178,7 @@ void GLWidget::initMesh()
     id_globalmesh=glGenLists(1);
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     //globalMesh.Draw(VERTEX_NORMAL_RGB);
-    //globalMesh.Draw(FACE_NORMAL_RGB);
-    globalMesh.Draw(LAPLACIAN);
-
-    globalMesh.graphLaplacian();
+    globalMesh.Draw(FACE_NORMAL_RGB);
 
     glEndList();
 
@@ -200,13 +186,12 @@ void GLWidget::initMesh()
     updateGL();
 }
 
-void GLWidget::calculateSpectrum(int frequency,bool flag)
+void GLWidget::calculateSpectrum(int frequency)
 {
     cout << "Laplacian starts now..." << endl;
     //Laplacian Calculation
     //globalMesh.laplacian();
-    if (flag == false) globalMesh.weightedLaplacian();
-    else globalMesh.laplacian();
+    globalMesh.weightedLaplacian();
 
     timer.Reset();
     timer.Start();
@@ -654,6 +639,8 @@ void GLWidget::smoothMesh(int frequency)
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
     glEndList();
+
+
     updateGL();
 }
 
@@ -664,6 +651,8 @@ void GLWidget::frequencyRemoval(int frequency)
     glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
     globalMesh.Draw(FACE_NORMAL_RGB);
     glEndList();
+
+
     updateGL();
 }
 

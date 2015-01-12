@@ -27,6 +27,19 @@
      </rect>
     </property>
    </widget>
+<<<<<<< HEAD
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>50</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Laplacian</string>
+=======
    <widget class="QPushButton" name="SpecButton">
     <property name="geometry">
      <rect>
@@ -216,6 +229,7 @@
     </property>
     <property name="text">
      <string>0</string>
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
     </property>
    </widget>
    <widget class="QRadioButton" name="graphLap">

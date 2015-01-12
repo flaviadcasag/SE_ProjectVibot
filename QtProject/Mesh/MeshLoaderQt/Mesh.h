@@ -24,6 +24,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
 using namespace Eigen;
 
 #include <cassert>
@@ -131,8 +132,16 @@ private:
 		// Color binding (per vertex or per face)
 		AttributeBinding color_binding;
 
+<<<<<<< HEAD
+        //Store the laplacian Eiven vectors
+        MatrixXd laplacianEigenVectors;
+
+        //Store the laplacian Eiven vectors
+        MatrixXd laplacianEigenValues;
+=======
         //Get EigenVectors
         MatrixXd getEigenVectors() {return eVectors;}
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
 
     //--
@@ -147,6 +156,7 @@ private:
 		void Draw_Face_Normal_Rgb(int i);
 		void Draw_Vertex_Normal(int);
 		void Draw_Vertex_Normal_Rgb(int);
+        void Draw_Laplacian(int);
 
 
 		//--

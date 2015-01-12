@@ -334,6 +334,12 @@ int i;
 
 switch(DRAW_MODE)
 	{
+    case LAPLACIAN :
+    {
+        glBegin(GL_TRIANGLES);
+        for( i=0; i<nb_faces; i++) Draw_Laplacian(i);
+        glEnd();
+    }break;
 	case ONLY_VERTEX	:
 		{
 			glDisable(GL_LIGHTING);
@@ -423,6 +429,27 @@ void Mesh::Draw_Face_Normal_Rgb(int i)
         glColor3d(C[0],C[1],C[2]);
 		glVertex3d(V[0],V[1],V[2]);
 	}
+
+
+}
+
+void Mesh::Draw_Laplacian(int i)
+{
+
+    //double ma = laplacianEigenVectors.col(0).maxCoeff();
+    //double mi = laplacianEigenVectors.col(0).minCoeff();
+    for(int j=0; j<3; j++)	{
+        glNormal3d(face_normals[i][0],face_normals[i][1],face_normals[i][2]);
+        Vector3d V=vertices[faces[i][j]];
+        Vector3d C=colors[faces[i][j]];
+
+        //double value = ((laplacianEigenVectors(i,1) - mi) / (ma-mi)) + mi;
+
+        glColor3d(1,
+                  0,
+                  1);
+        glVertex3d(V[0],V[1],V[2]);
+    }
 
 
 }

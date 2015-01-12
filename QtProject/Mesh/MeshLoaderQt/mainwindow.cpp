@@ -17,6 +17,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+<<<<<<< HEAD
+void MainWindow::on_pushButton_clicked()
+=======
 
 void MainWindow::on_SpecButton_clicked()
 {
@@ -81,6 +84,7 @@ void MainWindow::on_horizontalSlider_3_valueChanged(int value)
 }
 
 void MainWindow::on_horizontalSlider_2_actionTriggered(int action)
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 {
 }
 

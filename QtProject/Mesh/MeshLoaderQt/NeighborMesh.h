@@ -31,6 +31,10 @@ using namespace Eigen;
 #include <vector>
 #include <set>
 #include <map>
+<<<<<<< HEAD
+#include <iostream>
+#include <fstream>
+=======
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <GL/glut.h>
@@ -39,6 +43,7 @@ using namespace Eigen;
 #include <iostream>
 #include <cmath>
 
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 using namespace std;
 
 #include "Mesh.h"
@@ -51,6 +56,9 @@ class NeighborMesh : public Mesh
     NeighborMesh();
     virtual ~NeighborMesh();
 
+<<<<<<< HEAD
+    void graphLaplacian();
+=======
 
     void laplacian();
     void weightedLaplacian();
@@ -59,6 +67,7 @@ class NeighborMesh : public Mesh
     MatrixXd computeWeight();
 
     void SpectralDecomposition();
+>>>>>>> 4487723a2949a68a1c202d52a957a2cdad047d5a
 
     //attributes
 
