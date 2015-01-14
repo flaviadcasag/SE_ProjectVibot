@@ -20,8 +20,8 @@
 
 using namespace std;
 
-Vector3d DoubleToColor( const double d ){
-
+Vector3d DoubleToColor(const double d )
+{
 	if(d<0) return Vector3d(0,0,0);
 	if(0<=d && d<0.25)		{ return Vector3d(0 , d*4.0 ,1);}
 

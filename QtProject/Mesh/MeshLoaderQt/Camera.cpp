@@ -1,30 +1,41 @@
 #include "Camera.h"
 
+//Constructor
 Camera::Camera()
 {
 }
 
-
+//Get camera targer
 Vector3d Camera::getTarget()
 {
     return target;
 }
 
+//Get distance from the mesh
+double Camera::getDistance()
+{
+    return distance;
+}
+
+//get camera position
 Vector3d Camera::getPosition()
 {
     return position;
 }
 
-double Camera::initCamera(NeighborMesh& mesh)
+//Init camera parameters
+//This function also sets the extreme points in the mesh
+void Camera::initCamera(NeighborMesh& mesh)
 {
     //roughly adjust view frustrum to object and camera position
-    Vector3d Pmin(mesh.vertices[0]), Pmax(mesh.vertices[0]);
+    Vector3d Pmin(mesh.getVertex(0));
+    Vector3d Pmax(mesh.getVertex(0));
     Vector3d Center(0,0,0);
     Vector3d mins = Vector3d(0,0,0);
     Vector3d maxs = Vector3d(0,0,0);
-    for( int i=0; i< mesh.vertices.size(); i++)
+    for( int i=0; i< mesh.VertexNumber(); i++)
     {
-        Vector3d P(mesh.vertices[i]);
+        Vector3d P(mesh.getVertex(i));
         for( int j=0; j<2; j++)
         {
             if (P[j] < Pmin[j])
@@ -38,34 +49,33 @@ double Camera::initCamera(NeighborMesh& mesh)
                 Pmax[j] = P[j];
                 maxs[j] = i;
             }
-            //Pmin[j] = min(Pmin[j],P[j]);
-            //Pmax[j] = max(Pmax[j],P[j]);
         }
         Center += P;
     }
 
+    //set max and min
     mesh.setMaxs(maxs);
     mesh.setMins(mins);
 
-    Center/=mesh.vertices.size();
+    Center/=mesh.VertexNumber();
     target = Center;
 
     //length of the diagonal of the bouding box
-    double distance = (Pmax-Pmin).norm();
+    distance = (Pmax-Pmin).norm();
 
     //set arbitraty position to camera and adjusts max and min view planes
     position = target + Vector3d(0,0,distance*3);
     znear = distance*0.1;
     zfar = distance*5;
-
-    return distance;
 }
 
+//get z near parameter from the camera
 double Camera::getZnear ()
 {
     return znear;
 }
 
+//get z far parameter from the camera
 double Camera::getZfar ()
 {
     return zfar;

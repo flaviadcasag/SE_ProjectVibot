@@ -16,6 +16,10 @@
   <property name="windowTitle">
    <string>Laplacian Mesh Processing</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>favicon.ico</normaloff>favicon.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="GLWidget" name="RenderingWidget" native="true">
     <property name="geometry">
@@ -40,7 +44,7 @@
      <string>Compute Laplacian</string>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider">
+   <widget class="QSlider" name="ColoringSlider">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -69,7 +73,7 @@
      <string>Frequency coloring:</string>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider_2">
+   <widget class="QSlider" name="SmoothingSlider">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -103,7 +107,7 @@
      <rect>
       <x>630</x>
       <y>10</y>
-      <width>221</width>
+      <width>151</width>
       <height>41</height>
      </rect>
     </property>
@@ -150,7 +154,7 @@
      <string>Frequency</string>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider_3">
+   <widget class="QSlider" name="RemovalSlider">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -253,23 +257,7 @@
      <string notr="true">buttonGroup</string>
     </attribute>
    </widget>
-   <widget class="QPushButton" name="SpecButton_2">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>630</x>
-      <y>250</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Mesh Smoothing</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="SpecButton_3">
+   <widget class="QPushButton" name="RemovalButton">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -327,7 +315,7 @@
      <string>Mesh Editing</string>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider_4">
+   <widget class="QSlider" name="ScaleFactorSlider">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -360,6 +348,9 @@
     </property>
    </widget>
    <widget class="QRadioButton" name="meshx">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>860</x>
@@ -372,7 +363,7 @@
      <string>X</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <attribute name="buttonGroup">
      <string notr="true">buttonGroup_2</string>
@@ -389,6 +380,9 @@
     </property>
     <property name="text">
      <string>Y</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
     <attribute name="buttonGroup">
      <string notr="true">buttonGroup_2</string>
@@ -444,6 +438,22 @@
     </property>
     <property name="text">
      <string>Axis to scale:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="smoothingButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>250</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Mesh Smoothing</string>
     </property>
    </widget>
   </widget>

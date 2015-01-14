@@ -20,43 +20,25 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-
-
-
 private slots:
-
 
     void on_SpecButton_clicked();
 
-    void on_horizontalSlider_valueChanged(int value);
-
-    void on_smoothButton_clicked();
-
     void on_browseButton_clicked();
-
-    void on_horizontalSlider_2_actionTriggered(int action);
-
-    void on_horizontalSlider_2_valueChanged(int value);
-
-    void on_freqRemButton_clicked();
-
-    void on_horizontalSlider_3_valueChanged(int value);
-
-    void on_graphLap_clicked();
-
-    void on_geoLap_clicked();
-
-    void on_SpecButton_2_clicked();
-
-    void on_SpecButton_3_clicked();
 
     void on_ComputeLaplacianButton_clicked();
 
-    void on_horizontalSlider_4_valueChanged(int value);
+    void on_smoothingButton_clicked();
 
-    void on_meshx_clicked();
+    void on_RemovalButton_clicked();
 
-    void on_meshy_clicked();
+    void on_ColoringSlider_valueChanged(int value);
+
+    void on_SmoothingSlider_valueChanged(int value);
+
+    void on_RemovalSlider_valueChanged(int value);
+
+    void on_ScaleFactorSlider_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;

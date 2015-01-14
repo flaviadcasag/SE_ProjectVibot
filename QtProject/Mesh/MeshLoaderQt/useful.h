@@ -30,9 +30,6 @@ using namespace Eigen;
 	double ColorToDouble(Vector3d RGB);
 	Vector3d DoubleToColorDiscrete( const double d, double n =20);
 
-    //OpenGL text display
-	void PrintMessage(int,int, const string);
-
     //mesh perturbation if you want to play a little bit
     void AddGaussianNoise(vector<Vector3d> & vertices, vector<Vector3d> normals, double sigma,double mu=0);
 

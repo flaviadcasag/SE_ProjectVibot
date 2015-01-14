@@ -28,7 +28,9 @@ SOURCES += \
     Mesh.cpp \
     NeighborMesh.cpp \
     useful.cpp \
-    GLWidget.cpp
+    GLWidget.cpp \
+    LaplacianMesh.cpp \
+    Light.cpp
 
 HEADERS += \
     Camera.h \
@@ -38,7 +40,9 @@ HEADERS += \
     NeighborMesh.h \
     Stopwatch.h \
     useful.h \
-    GLWidget.h
+    GLWidget.h \
+    LaplacianMesh.h \
+    Light.h
 
 
 #to include the GL and Eigen directories which are 3 directories above the current project directory
@@ -50,8 +54,5 @@ LIBS += -lglut32 -lglu32 -lopengl32
 
 FORMS += \
     mainwindow.ui
-
-
-
 
 

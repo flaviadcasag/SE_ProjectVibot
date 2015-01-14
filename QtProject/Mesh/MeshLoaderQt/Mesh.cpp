@@ -24,14 +24,18 @@
 #include "useful.h"
 using namespace std;
 
-Mesh::Mesh(){}
+Mesh::Mesh()
+{
+    globalColor = Vector3d(0,1,0);
+}
+
 Mesh::~Mesh(){}
+
 //--
 //
 // ClearAll
 //
 //--
-
 void Mesh::ClearAll()
 {
 	// Initialize mesh
@@ -282,171 +286,6 @@ string UpperCase( const string& s )
 	// Return upper case string
 	return us;
 }
-
-
-
-void Mesh::Draw_Default(int i){
-
-
-	for(int j=0; j<3; j++)
-		glVertex3d(vertices[i][0],vertices[i][1],vertices[i][2]);
-
-
-}
-
-void Mesh::Draw_Face_Normal(int i){
-
-
-
-	for(int j=0; j<3; j++)	{
-		glNormal3d(face_normals[i][0],face_normals[i][1],face_normals[i][2]);
-		Vector3d V=Vertex(i,j);
-        glVertex3d(V[0],V[1],V[2]);
-	}
-
-
-}
-
-void Mesh::Draw_Vertex_Normal(int i){
-
-
-
-	for(int j=0; j<3; j++)	{
-
-		int vertex_index = faces[i][j];
-
-		Vector3d N(vertex_normals[vertex_index]);
-		Vector3d V(vertices[vertex_index]);
-		glNormal3d(N[0],N[1],N[2]);
-		glVertex3d(V[0],V[1],V[2]);
-	}
-
-
-}
-
-
-
-
-void Mesh::Draw(int DRAW_MODE)
-{
-int nb_faces=faces.size();
-int i;
-
-
-switch(DRAW_MODE)
-	{
-	case ONLY_VERTEX	:
-		{
-			glDisable(GL_LIGHTING);
-			cout<<"Vertices displayed="<<vertices.size()<<endl;
-
-			glPointSize(5.0);
-			glBegin(GL_POINTS);
-			bool color_on=false;
-			if(colors.size() == vertices.size()) color_on=true;
-			for( i=0 ; i<vertices.size(); i++ )
-			{
-                if(color_on) glColor3f(colors[i][0],colors[i][1],colors[i][2]);
-                glVertex3d(vertices[i][0],vertices[i][1],vertices[i][2]);
-			}
-
-			glEnd();
-
-			glEnable(GL_LIGHTING);
-
-		}break;
-
-	case FACE_NORMAL:
-		{	glBegin(GL_TRIANGLES);
-			for( i=0; i<nb_faces; i++) 				Draw_Face_Normal(i);
-		}break;
-
-	case FACE_NORMAL_RGB:
-		{
-			glBegin(GL_TRIANGLES);
-			for( i=0; i<nb_faces; i++) Draw_Face_Normal_Rgb(i);
-			glEnd();
-		}break;
-
-	case VERTEX_NORMAL		:
-		{
-			glBegin(GL_TRIANGLES);
-			for( i=0; i<nb_faces; i++) Draw_Vertex_Normal(i);
-			glEnd();
-		}	break;
-
-	case VERTEX_NORMAL_RGB	:
-		{
-//            vector<Vector3d> delta;
-
-//            for (i = 0; i < vertex.size(); i++)
-//            {
-//                di =
-//                delta.push_back(Vector3d(vertex[i]-1/));
-//            }
-
-//            for (i = 0; i < colors.size(); i++)
-//            {
-//                colors[i] = Vector3d(rand()/(double)RAND_MAX, rand()/(double)RAND_MAX, rand()/(double)RAND_MAX);
-//            }
-
-			glBegin(GL_TRIANGLES);
-			for( i=0; i<faces.size(); i++) Draw_Vertex_Normal_Rgb(i);
-			glEnd();
-		}	break;
-
-	}
-
-
-}
-
-
-void Mesh::Print_Stats()
-{
-	char s[250];
-	sprintf(s,"Faces   : %d", faces.size());
-    //PrintMessage( 10, 10, s );
-	sprintf(s,"Vertices: %d", vertices.size());
-
-	//add any information you want to display as text in the OGL window here
-
-}
-
-
-void Mesh::Draw_Face_Normal_Rgb(int i)
-{
-
-
-	for(int j=0; j<3; j++)	{
-		glNormal3d(face_normals[i][0],face_normals[i][1],face_normals[i][2]);
-		Vector3d V=vertices[faces[i][j]];
-		Vector3d C=colors[faces[i][j]];
-        glColor3d(C[0],C[1],C[2]);
-		glVertex3d(V[0],V[1],V[2]);
-	}
-
-
-}
-
-void Mesh::Draw_Vertex_Normal_Rgb(int i){
-
-	for(int j=0; j<3; j++)	{
-
-		int vertex_index = faces[i][j];
-
-		Vector3d N(vertex_normals[vertex_index]);
-		Vector3d V(vertices[vertex_index]);
-		Vector3d Col(colors[vertex_index]);
-
-        glNormal3d( N[0] , N[1] , N[2]);
-        glColor3d( Col[0] , Col[1] , Col[2]);
-
-		glVertex3d( V[0] , V[1] , V[2]);
-	}
-
-
-}
-
 
 
 

@@ -2,7 +2,7 @@
                                     Mesh.h
                              -------------------
     update               : 2002-10-11
-    copyright            : (C) 2002 by Michaël ROY
+    copyright            : (C) 2002 by Michaï¿½l ROY
     email                : michaelroy@users.sourceforge.net
 
     Edit Yohan Fougerolle
@@ -45,32 +45,12 @@ using namespace std;
 
 class NeighborMesh : public Mesh
 {
-    public:
-
+public:
     //constructor and destructor
     NeighborMesh();
     virtual ~NeighborMesh();
 
-
-    void laplacian();
-    void weightedLaplacian();
-    void smoothing(int frequency);
-    void frequencyRemoval(int frequency);
-    MatrixXd computeWeight();
-
-    void meshEditing(double size, int axis);
-
-    void SpectralDecomposition();
-
-    //attributes
-
-    vector < set<int> > P2P_Neigh;
-    vector < set<int> > P2F_Neigh;
-    vector < set<int> > F2F_Neigh;
-
-    vector<double> Labels;
-    map < pair <int,int>,  set<int> > Edges;
-
+    //returns the edge from the given indexes i1 and i2
     inline map < pair <int,int>,  set<int> > :: iterator Get_Edge(int i1, int i2)
     {
         pair <int, int> mypair;
@@ -79,47 +59,44 @@ class NeighborMesh : public Mesh
     }
 
     //construction of the previous attributes once the file is loaded
-
     bool Build_P2P_Neigh();
     bool Build_P2F_Neigh();
     bool Build_F2F_Neigh();
     bool Build_Edges();
     void BuildDistanceLabels(int A);
-    void BuildSpectralLabels( int i);
 
-    //rendering functions for verification
-
-    void DrawP2P_Neigh( int i );
-    void DrawP2F_Neigh( int i );
-    void DrawF2F_Neigh( int i );
-    void DrawEdge( int i);
-    void DrawEdge( map< pair<int,int>, set<int> > :: iterator it);
-    void DrawBoudaryEdges();
     vector<int> ShortestPath(int, int, bool buildlabels=false);
     void SetColorsFromLabels();
     void SetColorsFromKean(double n = 5);
 
     //compute extended neighborhoods
-
     set<int> GetP2P_Neigh( int, int );
     set<int> GetF2F_Neigh( int, int );
 
-    //drawing functions
-
-    void DrawPoints ( set <int> );
-    void DrawFaces  ( set <int> );
-
-    void  IllustratePointNeighbourhoodComputation(int,int);
-    void  IllustrateFaceNeighbourhoodComputation(int,int);
-    void  IllustrateEdges( int n);
-    void  IllustrateP2P_Neigh( int n);
-
-    void  IllustrateP2F_Neigh( int n );
-    void  IllustrateF2F_Neigh( int n );
-    void  IllustrateShortestPaths (int ngeod, int startpointindex);
-
+    //check if the triangle face is obtuse
     int IsObtuse( int face_index);
 
+    int getP2P_NeighSize();
+    int getP2F_NeighSize();
+
+    int getF2F_NeighSize();
+    set<int> getP2P_NeighSet(int i);
+    set<int> getP2F_NeighSet(int i);
+    set<int> getF2F_NeighSet(int i);
+    vector< set<int> > getP2P_Neigh();
+    vector< set<int> > getP2F_Neigh();
+    vector< set<int> > getF2F_Neigh();
+
+    map < pair <int,int>,  set<int> > getEdges() {return Edges;}
+
+protected:
+    //attributes
+    vector < set<int> > P2P_Neigh;
+    vector < set<int> > P2F_Neigh;
+    vector < set<int> > F2F_Neigh;
+
+    vector<double> Labels;
+    map < pair <int,int>,  set<int> > Edges;
 
 };
 

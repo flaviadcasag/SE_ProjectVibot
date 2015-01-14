@@ -19,205 +19,12 @@
 
 //constructor and destructor
 
-NeighborMesh :: NeighborMesh(){}
+NeighborMesh :: NeighborMesh()
+{
+
+}
 NeighborMesh :: ~NeighborMesh(){}
 
-void NeighborMesh :: laplacian()
-{
-    set<int>::iterator it;
-    ofstream out("p2p_neigh.txt");
-    ofstream Af("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/A.txt");
-    ofstream Df("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/D.txt");
-    ofstream Lf("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/Laplacian.txt");
-    for(int i=0; i< P2P_Neigh.size();i++)
-    {
-        for(it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
-        {
-            out<<(*it)<<" ";
-        }
-        out<<"\n";
-    }
-    out.close();
-    int N=P2P_Neigh.size();
-    MatrixXd A;
-    MatrixXd D;
-    A=MatrixXd::Zero(N,N);
-    D=MatrixXd::Zero(N,N);
-    set<int> neighp;
-
-    for(int i=0;i<P2P_Neigh.size(); i++)
-    {
-        neighp = P2P_Neigh.at(i);
-        for(it=neighp.begin(); it != neighp.end();it++)
-        {
-            A(i,(*it))=1;
-        }
-        D(i,i)=neighp.size();
-    }
-    laplacianMatrix = D-A;
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            Af << A(i,j) << " ";
-            Df << D(i,j) << " ";
-            Lf << laplacianMatrix(i,j) << " ";
-        }
-        Af << "\n";
-        Df << "\n";
-        Lf << "\n";
-    }
-
-    Af.close();
-    Df.close();
-    Lf.close();
-
-}
-
-double cot(double i) { return(1 / tan(i)); }
-
-MatrixXd NeighborMesh::computeWeight()
-{
-    int N = vertices.size();
-    MatrixXd W = MatrixXd::Zero(N,N);
-    int face[2];
-    set<int> intersect;
-    set<int>::iterator it;
-    set<int>::iterator it2;
-    for (int i = 0; i < N; i++)
-    {
-        set<int> currentP2P = P2P_Neigh[i];
-        int cc = 0;
-        int ms = currentP2P.size();
-        for (it = currentP2P.begin(); it != currentP2P.end(); it++)
-        {
-            int j = (*it);
-
-            set<int> faces1 = P2F_Neigh[i];
-            set<int> faces2 = P2F_Neigh[j];
-            intersect.clear();
-            set_intersection(faces1.begin(),faces1.end(),faces2.begin(),faces2.end(),
-                              std::inserter(intersect,intersect.begin()));
-            if (intersect.size() != 2)
-            {
-                W(i,j) = 0;
-            }
-            else
-            {
-
-                int cnt = 0;
-                for (it2 = intersect.begin(); it2 != intersect.end(); ++it2)
-                {
-                    face[cnt++] = (*it2);
-                }
-                int u = 0;
-                int v = 0;
-                for (int l = 0; l < 3; l++)
-                {
-                    if (faces[face[0]][l] != i && faces[face[0]][l] != j)
-                    {
-                        u = faces[face[0]][l];
-                    }
-                }
-                for (int l = 0; l < 3; l++)
-                {
-                    if (faces[face[1]][l] != i && faces[face[1]][l] != j)
-                    {
-                        v = faces[face[1]][l];
-                    }
-                }
-                Vector3d vec1 = vertices[u] - vertices[i];
-                Vector3d vec2 = vertices[u] - vertices[j];
-                Vector3d vec3 = vertices[v] - vertices[i];
-                Vector3d vec4 = vertices[v] - vertices[j];
-
-                double alpha = acos(vec1.dot(vec2)/(vec1.norm() * vec2.norm()));
-                double beta = acos(vec3.dot(vec4)/(vec3.norm() * vec4.norm()));
-                W(i,j) = cot(alpha) + cot(beta);
-            }
-        }
-    }
-    return W;
-}
-
-void NeighborMesh :: weightedLaplacian()
-{
-    set<int>::iterator it;
-    MatrixXd W = computeWeight();
-    ofstream out("p2p_neigh.txt");
-    ofstream Af("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WA.txt");
-    ofstream Df("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WD.txt");
-    ofstream Lf("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/WLaplacian.txt");
-    for(int i=0; i< P2P_Neigh.size();i++)
-    {
-        for(it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); it++)
-        {
-            out<<(*it)<<" ";
-        }
-        out<<"\n";
-    }
-    out.close();
-    int N=P2P_Neigh.size();
-    MatrixXd A;
-    MatrixXd D;
-    A=MatrixXd::Zero(N,N);
-    D=MatrixXd::Zero(N,N);
-    set<int> neighp;
-
-    for(int i=0;i<P2P_Neigh.size(); i++)
-    {
-        neighp = P2P_Neigh.at(i);
-        D(i,i)=W.row(i).sum();
-    }
-    laplacianMatrix = D-W;
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            Af << A(i,j) << " ";
-            Df << D(i,j) << " ";
-            Lf << laplacianMatrix(i,j) << " ";
-        }
-        Af << "\n";
-        Df << "\n";
-        Lf << "\n";
-    }
-
-    Af.close();
-    Df.close();
-    Lf.close();
-
-}
-
-void NeighborMesh :: SpectralDecomposition()
-{
-    SelfAdjointEigenSolver<MatrixXd> e(laplacianMatrix);
-    eValues = e.eigenvalues();
-    eVectors = e.eigenvectors();
-
-        ofstream laplaceEigenvalues("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/LapEigenValues.txt");
-        laplaceEigenvalues << eValues << "\n-------------------\n";
-        laplaceEigenvalues << eVectors << "\n-------------------\n";
-        laplaceEigenvalues.close();
-
-
-//    vector < pair<double,double> > eValVec;
-//    pair <double,double> p;
-//    ofstream laplaceEigenvalues("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/LapEigenValuesSorted.txt");
-//    for (int i=0;i = eValues.rows(); i++)
-//    {
-//        p = make_pair (eValues.coeff(i),eVectors.coeff(i));
-//        eValVec.push_back(p);
-//        laplaceEigenvalues << eValVec[i].first<< " " << eValVec[i].second <<  "\n";
-//    }
-
-//   //laplaceEigenvalues << eVectors << "\n-------------------\n";
-//    laplaceEigenvalues.close();
-
-
-}
 
 // construction of the various neighborhoods
 bool NeighborMesh :: Build_P2P_Neigh()
@@ -251,42 +58,7 @@ bool NeighborMesh :: Build_P2P_Neigh()
     return true;
 }
 
-
-void NeighborMesh :: DrawP2P_Neigh( int i )
-{
-    if ( P2P_Neigh.empty() || i >= P2P_Neigh.size() )  return;
-
-    glPointSize(5);
-
-    glDisable(GL_LIGHTING);
-
-    //render the considered point in red
-    Vector3d P(vertices[i]);
-
-    //Write the number of neighbours in the OGL window
-    glColor3f(1,0,0);
-    glPushMatrix();
-    glTranslatef(P[0], P[1], P[2]);
-    char s[255];
-    sprintf(s, "%d", P2P_Neigh[i].size());
-    string n(s);
-    //Print3DMessage(0,0,n);
-    glPopMatrix();
-
-    glBegin(GL_POINTS);
-    glColor3f(1,0,0);
-    glVertex3f(P[0], P[1], P[2]);
-
-    //render the neighbors in green
-    glColor3f(0,1,0);
-    for ( set <int> :: iterator it = P2P_Neigh[i].begin(); it != P2P_Neigh[i].end(); ++it)
-    {
-        P = vertices[*it];
-        glVertex3f(P[0], P[1], P[2]);
-    }
-    glEnd();
-}
-
+//build P2f nigh
 bool NeighborMesh :: Build_P2F_Neigh()
 {
     if ( vertices.empty() || faces.empty() ) return false;
@@ -309,34 +81,7 @@ bool NeighborMesh :: Build_P2F_Neigh()
     return true;
 }
 
-void NeighborMesh :: DrawP2F_Neigh( int i )
-{
-    if ( P2F_Neigh.empty() || i >= P2F_Neigh.size() )  return;
-
-    glPointSize(5);
-    glColor3f(1,0,0);
-    glDisable(GL_LIGHTING);
-
-    //render the considered point in red
-    Vector3d P(vertices[i]);
-    glBegin(GL_POINTS);
-    glVertex3f(P[0], P[1], P[2]);
-    glEnd();
-
-    //render the neighbor faces in dark green
-    glColor3f(0,0.5,0);
-
-    set <int> myset ( P2F_Neigh[i]);
-
-    glEnable(GL_LIGHTING);
-    glBegin(GL_TRIANGLES);
-
-    for ( set <int> :: iterator it = myset.begin(); it != myset.end(); it++) Draw_Face_Normal(*it);
-
-    glEnd();
-
-}
-
+//build f2f nigh
 bool NeighborMesh :: Build_F2F_Neigh()
 {
     if ( vertices.empty() || faces.empty() || P2F_Neigh.empty()) return false;
@@ -368,24 +113,7 @@ bool NeighborMesh :: Build_F2F_Neigh()
     return true;
 }
 
-void NeighborMesh :: DrawF2F_Neigh( int i )
-{
-    if(F2F_Neigh.empty() || i>F2F_Neigh.size() ) return;
-
-    //draw the considered face in red
-
-    glBegin(GL_TRIANGLES);
-    glColor3f(1,0,0);
-    Draw_Face_Normal(i);
-
-    //draw neighbor faces in blue
-    glColor3f(0,0,1);
-    set <int> myset ( F2F_Neigh[i]);
-    for ( set <int> :: iterator it = myset.begin(); it != myset.end(); it++)       Draw_Face_Normal(*it);
-    glEnd();
-}
-
-
+//get p2p neigh
 set<int> NeighborMesh :: GetP2P_Neigh( int p_index, int n)
 {
 
@@ -439,6 +167,7 @@ set<int> NeighborMesh :: GetP2P_Neigh( int p_index, int n)
     return new_ring;
 }
 
+//get f2f neigh
 set<int> NeighborMesh :: GetF2F_Neigh( int f_index, int n)
 {
     //same principle as for points, except that we are working with faces
@@ -492,24 +221,6 @@ set<int> NeighborMesh :: GetF2F_Neigh( int f_index, int n)
     return new_ring;
 }
 
-void NeighborMesh ::DrawPoints ( set <int> s)
-{
-    glBegin(GL_POINTS);
-    for( set<int>::iterator it(s.begin()); it != s.end(); it++)
-    {
-        Vector3d P(vertices[*it]);
-        glVertex3f(P[0],P[1],P[2]);
-    }
-    glEnd();
-}
-
-void NeighborMesh :: DrawFaces  ( set <int> s)
-{
-    for( set<int>::iterator it(s.begin()); it != s.end(); it++)
-    {
-        Draw_Face_Normal(*it);
-    }
-}
 
 bool NeighborMesh :: Build_Edges()
 {
@@ -546,93 +257,6 @@ bool NeighborMesh :: Build_Edges()
     }
     return true;
 
-}
-
-void NeighborMesh :: DrawEdge( map< pair<int,int>, set<int> > :: iterator it)
-{
-    pair < pair<int,int>,set<int> > myedge = *it;
-
-    Vector3d A(vertices[myedge.first.first]),B(vertices[myedge.first.second]);
-
-    glDisable(GL_LIGHTING);
-    glPointSize(5);
-
-    glBegin(GL_POINTS);
-    glColor3f(1,0,0);
-    glVertex3f(A[0],A[1],A[2]);
-    glColor3f(0,1,0);
-    glVertex3f(B[0],B[1],B[2]);
-    glEnd();
-
-    glLineWidth(3);
-    glColor3f(0,0,1);
-    glBegin(GL_LINES);
-    glVertex3f(A[0],A[1],A[2]);
-    glVertex3f(B[0],B[1],B[2]);
-    glEnd();
-
-    glEnable(GL_LIGHTING);
-    glColor3f(0.8,0.8,0);
-    glBegin(GL_TRIANGLES);
-    for(set<int> :: iterator it = myedge.second.begin(); it != myedge.second.end(); it++)
-    Draw_Face_Normal(*it);
-    glEnd();
-
-}
-void NeighborMesh :: DrawEdge(int i)
-{
-    if(i > Edges.size() ) return;
-
-    map <pair<int,int>,set<int> > :: iterator it(Edges.begin());
-    for(int j=0;j<i;j++, it++);
-    DrawEdge (it);
-
-}
-
-void  NeighborMesh :: DrawBoudaryEdges()
-{
-    //Illustrative function
-    //span edges which have a set a adjacent faces with 0 or 1 element
-
-    map <pair<int,int>,set<int> > :: iterator it;
-
-    glLineWidth(5);
-    glColor3f(1,0,0);
-    glDisable(GL_LIGHTING);
-    for(it = Edges.begin(); it != Edges.end(); it++)
-    {
-    pair < pair<int,int>,set<int> > myedge = *it;
-
-    if(myedge.second.size()<2)
-        {
-        Vector3d A(vertices[myedge.first.first]),B(vertices[myedge.first.second]);
-        glBegin(GL_LINES);
-        glVertex3f(A[0],A[1],A[2]);
-        glVertex3f(B[0],B[1],B[2]);
-        glEnd();
-        }
-
-    if(myedge.second.size()>2)
-        {
-        Vector3d A(vertices[myedge.first.first]),B(vertices[myedge.first.second]);
-        glColor3f(0,1,0);
-        glLineWidth(20);
-        glBegin(GL_LINES);
-        glVertex3f(A[0],A[1],A[2]);
-        glVertex3f(B[0],B[1],B[2]);
-        glEnd();
-        }
-    }
-}
-
-void NeighborMesh ::BuildSpectralLabels(int i)
-{
-    ofstream spectrallab("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/Lab.txt");
-    for(int j=0;j<eVectors.rows();j++){
-        spectrallab <<eVectors(j,i)<<endl;
-        Labels[j]=eVectors(j,i);
-    }
-    spectrallab.close();
 }
 
 void NeighborMesh ::BuildDistanceLabels(int A)
@@ -678,6 +302,7 @@ void NeighborMesh ::BuildDistanceLabels(int A)
     }
 }
 
+//compute shortest path
 vector<int> NeighborMesh :: ShortestPath(int A, int B,bool buildlabels)
 {
     vector<int> ShortestPath; // set of traversed points
@@ -717,7 +342,7 @@ vector<int> NeighborMesh :: ShortestPath(int A, int B,bool buildlabels)
     return ShortestPath;
 }
 
-
+//set colors from labels
 void NeighborMesh :: SetColorsFromLabels()
 {
     // brute force approach assuming that values are uniformly distributed (no outlier)
@@ -739,116 +364,10 @@ void NeighborMesh :: SetColorsFromLabels()
     }
 }
 
-void NeighborMesh :: IllustratePointNeighbourhoodComputation(int p_index, int n)
-{
-    glPointSize(10);
-    for(int i=0; i<n; i++)
-    {
-        set <int> tmp = GetP2P_Neigh(p_index, i);
-        if (i%2 == 0)    glColor3f(1,1-i/double(n),0);
-        else glColor3f(0,1-i/double(n),1);
-        DrawPoints ( tmp );
-    }
-}
-
-void NeighborMesh :: IllustrateFaceNeighbourhoodComputation(int f_index, int n)
-{
-
-    for(int i=0; i<n; i++)
-    {
-        set <int> tmp = GetF2F_Neigh(f_index, i);
-        if (i%2 == 0)    glColor3f(1,1-i/double(n),0);
-        else glColor3f(0,1-i/double(n),1);
-        glBegin(GL_TRIANGLES);
-        DrawFaces ( tmp );
-        glEnd();
-    }
-}
-
-
-void  NeighborMesh :: IllustrateEdges( int n)
-{
-    map< pair<int,int>, set<int> > :: iterator it (Edges.begin());
-    int i(0);
-    while (i<n)
-    {
-        DrawEdge(it) ;
-
-        for (int j=0; j<Edges.size()/n; j++, it++){}
-        i++;
-    }
-}
-void  NeighborMesh :: IllustrateP2P_Neigh( int n)
-{
-    for(int i=0; i<n; i++)
-    {
-        DrawP2P_Neigh( i * int(P2P_Neigh.size()/n) );
-    }
-
-}
-
-void   NeighborMesh :: IllustrateP2F_Neigh( int n)
-{
-    for(int i=0; i<n; i++)
-    {
-        DrawP2F_Neigh( i * int(P2F_Neigh.size()/n) );
-    }
-}
-
-
-void   NeighborMesh :: IllustrateF2F_Neigh( int n)
-{
-    for(int i=0; i<n; i++)
-    {
-        DrawF2F_Neigh( i * int(F2F_Neigh.size()/n) );
-    }
-
-}
-
-
-
-void   NeighborMesh :: IllustrateShortestPaths (int ngeod, int startpointindex)
-{
-    //Recompute everything in case labels have been corrupted
-
-    BuildDistanceLabels(startpointindex);
-    SetColorsFromLabels();
-
-    //construct geod approx
-
-     for(int i=1; i< ngeod+1; i++){
-        cout<<"Geodesic "<<i<<"...";
-        vector<int> mypath = ShortestPath(
-            startpointindex,
-            i*int(vertices.size()/ngeod - 1)
-
-         );
-
-        if(!mypath.empty())
-        {
-        Vector3d Col=DoubleToColor((i-1.0)/ngeod);
-        glColor3f(Col[0],Col[1], Col[2]);
-        glLineWidth(5);
-        glDisable(GL_LIGHTING);
-        glBegin(GL_LINE_STRIP);
-        for(vector<int>::iterator it(mypath.begin()); it != mypath.end(); it++)
-            {
-           Vector3d P(vertices[*it]);
-           glVertex3f(P[0],P[1],P[2]);
-            }
-        glEnd();
-         }
-        cout<<"done"<<endl;
-    }
-
-
-
-}
 
 
 // returns the index of a vertex of a face for which the associated angle is obtuse
 // returns -1 if the triangle is not obtuse
-
 int NeighborMesh :: IsObtuse(int f_index)
 {
     assert ( f_index >=0 && f_index<faces.size() );
@@ -864,131 +383,54 @@ int NeighborMesh :: IsObtuse(int f_index)
     return -1;
 }
 
-void NeighborMesh::smoothing(int frequency)
+//get p2p neigh size
+int NeighborMesh::getP2P_NeighSize()
 {
-    MatrixXd verticesMat(originalVertices.size(),3);
-    MatrixXd delta;
-    for (int i = 0; i < originalVertices.size();i++)
-    {
-        for (int j = 0; j < 3;j++)
-        {
-            verticesMat(i,j)=originalVertices[i][j];
-        }
-    }
-
-    delta=eVectors.inverse()*verticesMat;
-    int init = frequency;
-    for (int i = init; i < delta.rows();i++)
-    {
-        for (int j = 0; j < delta.cols();j++)
-        {
-            delta(i,j) = 0;
-        }
-    }
-
-    MatrixXd smooth = eVectors*delta;
-
-    for (int i = 0; i < vertices.size();i++)
-    {
-        for (int j = 0; j < 3;j++)
-        {
-            vertices[i][j] = smooth(i,j);
-        }
-    }
-
-    for (int i = 0; i < colors.size();i++)
-    {
-       colors[i][0]= 0;
-       colors[i][1]= 1;
-       colors[i][2]= 0;
-    }
-
-
+    return P2P_Neigh.size();
 }
 
-void NeighborMesh::frequencyRemoval(int frequency)
+//get p2f neigh size
+int NeighborMesh::getP2F_NeighSize()
 {
-    MatrixXd verticesMat(originalVertices.size(),3);
-    MatrixXd delta;
-    for (int i = 0; i < originalVertices.size();i++)
-    {
-        for (int j = 0; j < 3;j++)
-        {
-            verticesMat(i,j)=originalVertices[i][j];
-        }
-    }
-
-    delta=eVectors.inverse()*verticesMat;
-    for (int j = 0; j < delta.cols();j++)
-    {
-        delta(frequency,j) = 0;
-    }
-
-    MatrixXd removal = eVectors*delta;
-
-    for (int i = 0; i < vertices.size();i++)
-    {
-        for (int j = 0; j < 3;j++)
-        {
-            vertices[i][j] = removal(i,j);
-        }
-    }
-
-    for (int i = 0; i < colors.size();i++)
-    {
-       colors[i][0]= 0;
-       colors[i][1]= 1;
-       colors[i][2]= 0;
-    }
+    return P2F_Neigh.size();
 }
 
-void NeighborMesh::meshEditing(double size, int axis)
+//get f2f neigh size
+int NeighborMesh::getF2F_NeighSize()
 {
-
-    int getMin = 0;
-    int getMax = 0;
-    Vector3d sizes(1,1,1);
-    sizes[axis] = size;
-
-    getMax = maxs[axis];
-    getMin = mins[axis];
-
-    MatrixXd verticesMat(originalVertices.size(),3);
-    MatrixXd delta;
-    for (int i = 0; i < originalVertices.size();i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            verticesMat(i,j)=originalVertices[i][j];
-        }
-    }
-
-    delta=laplacianMatrix*verticesMat;
-
-    MatrixXd laplacianAnchors(laplacianMatrix.rows()+2, laplacianMatrix.cols());
-    MatrixXd B;
-    B = MatrixXd::Zero(2,laplacianMatrix.cols());
-    B(0,getMin) = 1;
-    B(1,getMax) = 1;
-    laplacianAnchors << laplacianMatrix, B;
-
-    MatrixXd deltaAnchors(delta.rows()+2, delta.cols());
-
-    MatrixXd C(2,3);
-    C(0,0) = verticesMat(getMin,0); C(0,1) = verticesMat(getMin,1); C(0,2) = verticesMat(getMin,2);
-    C(1,0) = verticesMat(getMax,0)*sizes[0]; C(1,1) = verticesMat(getMax,1)*sizes[1]; C(1,2) = verticesMat(getMax,2)*sizes[2];
-
-    deltaAnchors << delta,C;
-
-    MatrixXd newVertices = (laplacianAnchors.transpose()*laplacianAnchors).inverse()*laplacianAnchors.transpose()*deltaAnchors;
-
-    for (int i = 0; i < vertices.size();i++)
-    {
-        for (int j = 0; j < 3;j++)
-        {
-            vertices[i][j] = newVertices(i,j);
-        }
-    }
-
+    return F2F_Neigh.size();
 }
 
+//get p2p negh set according to the point index given
+set<int> NeighborMesh::getP2P_NeighSet(int i)
+{
+    return P2P_Neigh[i];
+}
+//get p2f negh set according to the point index given
+set<int> NeighborMesh::getP2F_NeighSet(int i)
+{
+    return P2F_Neigh[i];
+}
+
+//get f2f negh set according to the face index given
+set<int> NeighborMesh::getF2F_NeighSet(int i)
+{
+    return F2F_Neigh[i];
+}
+
+//get p2p vector
+vector<set<int> > NeighborMesh::getP2P_Neigh()
+{
+    return P2P_Neigh;
+}
+//get p2f vector
+vector<set<int> > NeighborMesh::getP2F_Neigh()
+{
+    return P2F_Neigh;
+}
+
+//get f2f vector
+vector<set<int> > NeighborMesh::getF2F_Neigh()
+{
+    return F2F_Neigh;
+}

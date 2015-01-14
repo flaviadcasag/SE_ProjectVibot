@@ -1,5 +1,10 @@
+#include<iostream>
+
 #include "GLWidget.h"
 
+using namespace std;
+
+//GLWidget constructor
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
@@ -18,21 +23,20 @@ GLWidget::GLWidget(QWidget *parent)
     }
 }
 
+//GL widget key press event
 void GLWidget::keyPressEvent(QKeyEvent *keyEvent)
 {
     Keyboard(keyEvent);
     updateGL();
 }
 
-
-#include<iostream>
-using namespace std;
-
+//Time out slot
 void GLWidget::timeOutSlot()
 {
     updateGL();
 }
 
+//Initialize opengl window
 void GLWidget::initializeGL()
 {
     rotate=0;
@@ -41,6 +45,8 @@ void GLWidget::initializeGL()
     for(int i=0;i<4;i++)
         for(int j=0;j<4;j++)
             Current_Matrix[i][j]=0;
+
+    name = "Laplacian Mesh Processing";
 
     Current_Matrix[0][0]=Current_Matrix[1][1]=Current_Matrix[2][2]=Current_Matrix[3][3]=1; // current matrix transform for trackball
 
@@ -57,11 +63,14 @@ void GLWidget::initializeGL()
     Color_Steps.push_back(COL_YELLOW);
     Color_Steps.push_back(COL_RED);
 
+    //set name of the window
     setWindowTitle(QString(name.c_str()));
+
+    //initializing the opengl widget with white color
     glClearColor(1,1,1,1);
 }
 
-
+//Init the mesh parameters
 void GLWidget::initMesh()
 {
     // set the drawing mode to full rendering
@@ -96,19 +105,16 @@ void GLWidget::initMesh()
     glEnable( GL_POINT_SMOOTH );
     glHint( GL_POINT_SMOOTH, GL_NICEST );
 
-
-
     timer.Reset();
     timer.Start();  
     //load a mesh from a file
-    //string file_name ("d:/Users/Luis/Documents/uB/Software Engineering/SEProject/SE_ProjectVibot/VRML/mannequin.wrl");
     if (!globalMesh.ReadFile(fileName)) exit(0);
 
     timer.Stop();
     log->append("Loading time :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
-
-    globalMesh.originalVertices = vector<Vector3d>(globalMesh.vertices);
+    //store the original vertices  for further computations
+    globalMesh.setOriginalVertices(vector<Vector3d>(globalMesh.Vertices()));
 
     //construct P2P : point to point connectivity
     timer.Reset();
@@ -138,13 +144,8 @@ void GLWidget::initMesh()
     timer.Stop();
     log->append("Egdes construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
-    //Init camera parameters based on the globalMesh
-    double distance = cam.initCamera(globalMesh);
-
-    //adjust displacements consequently
-    objectMove[0] = distance/20;
-    objectMove[1] = distance/20;
-    objectMove[2] = distance/20;
+    //update camera parameters
+    updateCamera();
 
     //creates lights accordingly to the position and size of the object
     createLighting();
@@ -154,7 +155,6 @@ void GLWidget::initMesh()
     globalMesh.ComputeVertexNormals(); //normals to vertex
 
     //Example of distance computing:
-
     int startpointindex = 0;
 
     timer.Reset();
@@ -163,7 +163,6 @@ void GLWidget::initMesh()
     // consider the mesh as a graph and run shortest path algo
     // then stores distances in the label array
     globalMesh.BuildDistanceLabels(startpointindex);
-
     timer.Stop();
     log->append("Distance label construction :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
@@ -173,48 +172,47 @@ void GLWidget::initMesh()
     globalMesh.SetColorsFromLabels();
     timer.Stop();
     log->append("Constructing colors from distance :"+ QString::number(timer.GetTotal()/1000.0)+" s");
+    log->append("MESH LOADED!");
 
     //ok now here render
-    id_globalmesh=glGenLists(1);
-    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    globalMesh.Draw(FACE_NORMAL_RGB);
+    updateMesh();
 
-    glEndList();
-
+    //update camera
     resizeGL(width(),height());
+
+    //update window
     updateGL();
 }
 
+//calculate spectrum decomposition
+//according to the given frequency to build the labels
 void GLWidget::calculateSpectrum(int frequency)
 {
     log->append("Laplacian calculation starts now");
     timer.Reset();
     timer.Start();
-    globalMesh.SpectralDecomposition();
+    globalMesh.spectralDecomposition();
     timer.Stop();
     log->append("Finish calculating spectral decomposition :"+ QString::number(timer.GetTotal()/1000.0)+" s");
 
     globalMesh.BuildSpectralLabels(frequency);
     globalMesh.SetColorsFromLabels();
-    id_globalmesh=glGenLists(1);
-    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    globalMesh.Draw(FACE_NORMAL_RGB);
-    glEndList();
+    updateMesh();
     updateGL();
 }
 
+//build the color spectrum according to the given frequency
 void GLWidget::colorSpectrum(int value)
 {
     log->append("Selecting different frequencies for spectral decomposition");
     globalMesh.BuildSpectralLabels(value);
     globalMesh.SetColorsFromLabels();
-    id_globalmesh=glGenLists(1);
-    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    globalMesh.Draw(FACE_NORMAL_RGB);
-    glEndList();
+    updateMesh();
     updateGL();
 }
 
+//update window if it is resized
+//also update the camera
 void GLWidget::resizeGL(int width, int height)
 {
     glPushMatrix();
@@ -239,44 +237,68 @@ void GLWidget::resizeGL(int width, int height)
     glMatrixMode(GL_MODELVIEW);
 }
 
+//display
 void GLWidget :: paintGL()
 {
     display();
 }
 
+//set window name
 void GLWidget::setName(string name)
 {
     this->name = name;
 }
 
+//set frames per second
 void GLWidget::setFramesPerSecond(float fps)
 {
     framesPerSecond = fps;
 }
 
+//create light getting the parameters from the light object
 void GLWidget::createLighting()
 {
     //function to play around with open GL lights
     glEnable(GL_COLOR_MATERIAL);
 
     //roughly speaking : color of reflected light
-    GLfloat specular[]={1.0, 1.0, 1.0, 1.0};
+
+    GLfloat specular[]={light.getSpecular()[0],
+                        light.getSpecular()[1],
+                        light.getSpecular()[2],
+                        light.getSpecular()[3]};
+
     glMaterialfv(GL_FRONT,GL_SPECULAR,specular);
 
     //intensity of the shining...
-    GLfloat shine[]={100};
+    GLfloat shine[]={light.getShine()};
     glMaterialfv(GL_FRONT,GL_SHININESS,shine);
 
     //ambient and diffuse light
-    GLfloat ambient[]={0.0, 0.0, 0.0, 1.0};
-    GLfloat diffuse[]={0.4, 0.4, 0.4, 1.0};
+    GLfloat ambient[]={light.getAmbient()[0],
+                       light.getAmbient()[1],
+                       light.getAmbient()[2],
+                       light.getAmbient()[3]};
+
+    GLfloat diffuse[]={light.getDiffuse()[0],
+                       light.getDiffuse()[1],
+                       light.getDiffuse()[2],
+                       light.getDiffuse()[3]};
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 
     //set spot light cone, direction, angle, etc
-    GLfloat position[]={cam.getPosition()[0],cam.getPosition()[1],cam.getPosition()[2] + 10 ,1};
+    light.setPositionByCamera(cam.getPosition()[0],
+                              cam.getPosition()[1],
+                              cam.getPosition()[2]);
+
     Vector3d Dir = -(cam.getPosition() -cam.getTarget()).normalized();
-    GLfloat spot_direction[] = {Dir[0],Dir[1],Dir[2]};
+    light.setDirection(Dir[0],Dir[1],Dir[2]);
+    GLfloat spot_direction[] = {light.getDirection()[0],
+                                light.getDirection()[1],
+                                light.getDirection()[2]};
+
     glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 360.0);
     glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
     glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 2.0);
@@ -285,6 +307,7 @@ void GLWidget::createLighting()
     glEnable(GL_LIGHT0);
 }
 
+//trackball mapping
 Vector3d GLWidget::TrackballMapping( int x, int y )
 {
     static const double PI_2 = 3.141592653589793238462643383/2.0;
@@ -305,12 +328,13 @@ Vector3d GLWidget::TrackballMapping( int x, int y )
     return v.normalized();
 }
 
+//mouse motion function
 void GLWidget::Motion( int x ,int y)
 {
     static Vector3d current_position;
 
-    if(rotate)	{
-
+    if(rotate)
+    {
         current_position = TrackballMapping( x, y );  // Map the mouse position to a logical
 
         //
@@ -322,28 +346,28 @@ void GLWidget::Motion( int x ,int y)
         previous_trackball_position = current_position;
     }
 
-    if(translate){
+    if(translate)
+    {
+//        if( (y - oldy) > 0)
+//            translations[2] += objectMove[2];
+//        else
+//            translations[2] -= objectMove[2];
 
-        if( (y - oldy) > 0)
-            translations[2] += objectMove[2];
-        else
-            translations[2] -= objectMove[2];
-
-        oldx=x;
-        oldy=y;
+//        oldx=x;
+//        oldy=y;
     }
-
 }
 
+//Mouse event function
 void GLWidget::Mouse (QMouseEvent* event)
 {
     rotate=0;
-    if (event->buttons() && Qt::LeftButton)
+    if (event->buttons() == Qt::LeftButton)
     {
         rotate=1;
         previous_trackball_position = TrackballMapping( event->x(), event->y() );
     }
-    else if (event->buttons() && Qt::RightButton)
+    else if (event->buttons() == Qt::RightButton)
     {
         translate=1;
         oldx = event->x();
@@ -351,7 +375,7 @@ void GLWidget::Mouse (QMouseEvent* event)
     }
 }
 
-
+//display function
 void GLWidget::display(void)
 {
     GLboolean lights_on[1];
@@ -434,14 +458,14 @@ void GLWidget::display(void)
     rotation_angle = 0;
 }
 
-
+//mouse movement function
 void GLWidget::mouseMoveEvent(QMouseEvent * mouse)
 {
     Motion(mouse->x(),mouse->y());
     updateGL();
 }
 
-
+//draw color bar
 void GLWidget::Draw_Color_Bar(int size_x, int size_y,int x_init,int y_init)
 {
     // store draw mode (light and polygon mode)
@@ -529,6 +553,7 @@ void GLWidget::Draw_Color_Bar(int size_x, int size_y,int x_init,int y_init)
     glPolygonMode(GL_FRONT,polygon_draw_mode[0]|polygon_draw_mode[1]);
 }
 
+//keyboard event function
 void GLWidget::Keyboard(QKeyEvent *keyEvent)
 {
     glMatrixMode(GL_PROJECTION);
@@ -568,6 +593,7 @@ void GLWidget::Keyboard(QKeyEvent *keyEvent)
     glMatrixMode(GL_MODELVIEW);
 }
 
+//mouse release function
 void GLWidget::MouseRelease(QMouseEvent* event)
 {
     if (event->buttons() && Qt::LeftButton)
@@ -582,72 +608,526 @@ void GLWidget::MouseRelease(QMouseEvent* event)
     }
 }
 
+//mouse release event function
 void GLWidget::mouseReleaseEvent(QMouseEvent* mouse)
 {
     MouseRelease(mouse);
     updateGL();
 }
 
+//mouse press event function
 void GLWidget::mousePressEvent(QMouseEvent* event)
 {
     Mouse(event);
     updateGL();
 }
 
+//interface to the load mesh
 void GLWidget::loadMesh(string filename)
 {
     fileName = filename;
-    globalMesh = NeighborMesh();
+    globalMesh = LaplacianMesh();
     initMesh();
 }
 
+//interface to smooth the mesh
 void GLWidget::smoothMesh(int frequency)
 {
     globalMesh.smoothing(frequency);
-    id_globalmesh=glGenLists(1);
-    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    globalMesh.Draw(FACE_NORMAL_RGB);
-    glEndList();
+    updateMesh();
     updateGL();
 }
 
+//interface to remove one frequency
 void GLWidget::frequencyRemoval(int frequency)
 {
     globalMesh.frequencyRemoval(frequency);
-    id_globalmesh=glGenLists(1);
-    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    globalMesh.Draw(FACE_NORMAL_RGB);
-    glEndList();
+    updateMesh();
     updateGL();
 }
 
+//interface to edit the mesh
 void GLWidget::meshEdit(double size, int axis)
 {
     globalMesh.meshEditing(size, axis);
-
-    //Init camera parameters based on the globalMesh
-    double distance = cam.initCamera(globalMesh);
-
-    //adjust displacements consequently
-    objectMove[0] = distance/20;
-    objectMove[1] = distance/20;
-    objectMove[2] = distance/20;
-
-    id_globalmesh=glGenLists(1);
-    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
-    globalMesh.Draw(FACE_NORMAL_RGB);
-    glEndList();
-
-    resizeGL(width(), height());
+    updateMesh();
+    updateCamera();
     updateGL();
 }
 
+//compute laplacian according to the mode
+//mode 1 normal laplacian
+//mode 2 weighted laplacian
 void GLWidget::computeLaplacian(int mode)
 {
     switch (mode)
     {
         case 1 : globalMesh.laplacian(); break;
         case 2 : globalMesh.weightedLaplacian(); break;
+    }
+}
+
+//Update the camera parameters according to the global mesh measures
+void GLWidget::updateCamera()
+{
+    //Init camera parameters based on the globalMesh
+    cam.initCamera(globalMesh);
+
+    //get the distance from the camera to the mesh
+    double distance = cam.getDistance();
+
+    //adjust displacements consequently
+    objectMove[0] = distance/20;
+    objectMove[1] = distance/20;
+    objectMove[2] = distance/20;
+
+    resizeGL(width(), height());
+}
+
+//Update the mesh in order to draw
+void GLWidget::updateMesh()
+{
+    id_globalmesh=glGenLists(1);
+    glNewList(id_globalmesh,GL_COMPILE_AND_EXECUTE);
+    Draw(FACE_NORMAL_RGB);
+    glEndList();
+}
+
+//draw points
+void GLWidget ::DrawPoints ( set <int> s)
+{
+    glBegin(GL_POINTS);
+    for( set<int>::iterator it(s.begin()); it != s.end(); it++)
+    {
+        Vector3d P(globalMesh.getVertex(*it));
+        glVertex3f(P[0],P[1],P[2]);
+    }
+    glEnd();
+}
+
+//draw faces
+void GLWidget :: DrawFaces  ( set <int> s)
+{
+    for( set<int>::iterator it(s.begin()); it != s.end(); it++)
+    {
+        Draw_Face_Normal(*it);
+    }
+}
+
+//draw edge
+void GLWidget :: DrawEdge( map< pair<int,int>, set<int> > :: iterator it)
+{
+    pair < pair<int,int>,set<int> > myedge = *it;
+
+    Vector3d A(globalMesh.getVertex(myedge.first.first));
+    Vector3d B(globalMesh.getVertex(myedge.first.second));
+
+    glDisable(GL_LIGHTING);
+    glPointSize(5);
+
+    glBegin(GL_POINTS);
+    glColor3f(1,0,0);
+    glVertex3f(A[0],A[1],A[2]);
+    glColor3f(0,1,0);
+    glVertex3f(B[0],B[1],B[2]);
+    glEnd();
+
+    glLineWidth(3);
+    glColor3f(0,0,1);
+    glBegin(GL_LINES);
+    glVertex3f(A[0],A[1],A[2]);
+    glVertex3f(B[0],B[1],B[2]);
+    glEnd();
+
+    glEnable(GL_LIGHTING);
+    glColor3f(0.8,0.8,0);
+    glBegin(GL_TRIANGLES);
+    for(set<int> :: iterator it = myedge.second.begin(); it != myedge.second.end(); it++)
+    Draw_Face_Normal(*it);
+    glEnd();
+
+}
+
+//draw edge
+void GLWidget :: DrawEdge(int i)
+{
+    if(i > globalMesh.getEdges().size() ) return;
+
+    map <pair<int,int>,set<int> > :: iterator it(globalMesh.getEdges().begin());
+    for(int j=0;j<i;j++, it++);
+        DrawEdge (it);
+
+}
+
+//draw boundary edges
+void  GLWidget :: DrawBoudaryEdges()
+{
+    //Illustrative function
+    //span edges which have a set a adjacent faces with 0 or 1 element
+
+    map <pair<int,int>,set<int> > :: iterator it;
+
+    glLineWidth(5);
+    glColor3f(1,0,0);
+    glDisable(GL_LIGHTING);
+    for(it = globalMesh.getEdges().begin(); it != globalMesh.getEdges().end(); it++)
+    {
+    pair < pair<int,int>,set<int> > myedge = *it;
+
+    if(myedge.second.size()<2)
+        {
+        Vector3d A(globalMesh.getVertex(myedge.first.first));
+        Vector3d B(globalMesh.getVertex(myedge.first.second));
+        glBegin(GL_LINES);
+        glVertex3f(A[0],A[1],A[2]);
+        glVertex3f(B[0],B[1],B[2]);
+        glEnd();
+        }
+
+    if(myedge.second.size()>2)
+        {
+        Vector3d A(globalMesh.getVertex(myedge.first.first));
+        Vector3d B(globalMesh.getVertex(myedge.first.second));
+        glColor3f(0,1,0);
+        glLineWidth(20);
+        glBegin(GL_LINES);
+        glVertex3f(A[0],A[1],A[2]);
+        glVertex3f(B[0],B[1],B[2]);
+        glEnd();
+        }
+    }
+}
+
+//illustrate point neighourhood computation
+void GLWidget :: IllustratePointNeighbourhoodComputation(int p_index, int n)
+{
+    glPointSize(10);
+    for(int i=0; i<n; i++)
+    {
+        set <int> tmp = globalMesh.GetP2P_Neigh(p_index, i);
+        if (i%2 == 0)    glColor3f(1,1-i/double(n),0);
+        else glColor3f(0,1-i/double(n),1);
+        DrawPoints ( tmp );
+    }
+}
+
+//illustrate face neighourhood computation
+void GLWidget :: IllustrateFaceNeighbourhoodComputation(int f_index, int n)
+{
+    for(int i=0; i<n; i++)
+    {
+        set <int> tmp = globalMesh.GetF2F_Neigh(f_index, i);
+        if (i%2 == 0)    glColor3f(1,1-i/double(n),0);
+        else glColor3f(0,1-i/double(n),1);
+        glBegin(GL_TRIANGLES);
+        DrawFaces ( tmp );
+        glEnd();
+    }
+}
+
+//illustrate edges
+void  GLWidget :: IllustrateEdges( int n)
+{
+    map< pair<int,int>, set<int> > :: iterator it (globalMesh.getEdges().begin());
+    int i(0);
+    while (i<n)
+    {
+        DrawEdge(it) ;
+
+        for (int j=0; j<globalMesh.getEdges().size()/n; j++, it++){}
+        i++;
+    }
+}
+
+//illustrate P2P neighourhood computation
+void  GLWidget :: IllustrateP2P_Neigh( int n)
+{
+    for(int i=0; i<n; i++)
+    {
+        DrawP2P_Neigh( i * int(globalMesh.getP2P_NeighSize()/n) );
+    }
+
+}
+
+//illustrate P2F neighourhood computation
+void GLWidget :: IllustrateP2F_Neigh( int n)
+{
+    for(int i=0; i<n; i++)
+    {
+        DrawP2F_Neigh( i * int(globalMesh.getP2F_Neigh().size()/n) );
+    }
+}
+
+//illustrate F2F neighourhood computation
+void   GLWidget :: IllustrateF2F_Neigh( int n)
+{
+    for(int i=0; i<n; i++)
+    {
+        DrawF2F_Neigh( i * int(globalMesh.getF2F_Neigh().size()/n) );
+    }
+}
+
+
+//illustrate shortest paths
+void   GLWidget :: IllustrateShortestPaths (int ngeod, int startpointindex)
+{
+    //Recompute everything in case labels have been corrupted
+
+    globalMesh.BuildDistanceLabels(startpointindex);
+    globalMesh.SetColorsFromLabels();
+
+    //construct geod approx
+
+     for(int i=1; i< ngeod+1; i++){
+        cout<<"Geodesic "<<i<<"...";
+        vector<int> mypath = globalMesh.ShortestPath(
+            startpointindex,
+            i*int(globalMesh.VertexNumber()/ngeod - 1)
+         );
+
+        if(!mypath.empty())
+        {
+        Vector3d Col=DoubleToColor((i-1.0)/ngeod);
+        glColor3f(Col[0],Col[1], Col[2]);
+        glLineWidth(5);
+        glDisable(GL_LIGHTING);
+        glBegin(GL_LINE_STRIP);
+        for(vector<int>::iterator it(mypath.begin()); it != mypath.end(); it++)
+            {
+           Vector3d P(globalMesh.getVertex(*it));
+           glVertex3f(P[0],P[1],P[2]);
+            }
+        glEnd();
+         }
+        cout<<"done"<<endl;
+    }
+}
+
+//Draw p2p neigh
+void GLWidget :: DrawP2P_Neigh( int i )
+{
+    if ( globalMesh.getP2P_Neigh().empty() || i >= globalMesh.getP2P_Neigh().size() )
+        return;
+
+    glPointSize(5);
+
+    glDisable(GL_LIGHTING);
+
+    //render the considered point in red
+    Vector3d P(globalMesh.getVertex(i));
+
+    //Write the number of neighbours in the OGL window
+    glColor3f(1,0,0);
+    glPushMatrix();
+    glTranslatef(P[0], P[1], P[2]);
+    char s[255];
+    sprintf(s, "%d", globalMesh.getP2P_NeighSet(i).size());
+    string n(s);
+    //Print3DMessage(0,0,n);
+    glPopMatrix();
+
+    glBegin(GL_POINTS);
+    glColor3f(1,0,0);
+    glVertex3f(P[0], P[1], P[2]);
+
+    //render the neighbors in green
+    glColor3f(0,1,0);
+    for ( set <int> :: iterator it = globalMesh.getP2P_NeighSet(i).begin(); it != globalMesh.getP2P_NeighSet(i).end(); ++it)
+    {
+        P = globalMesh.getVertex(*it);
+        glVertex3f(P[0], P[1], P[2]);
+    }
+    glEnd();
+}
+
+//Draw p2f neigh
+void GLWidget :: DrawP2F_Neigh( int i )
+{
+    if ( globalMesh.getP2F_Neigh().empty() || i >= globalMesh.getP2F_Neigh().size() )  return;
+
+    glPointSize(5);
+    glColor3f(1,0,0);
+    glDisable(GL_LIGHTING);
+
+    //render the considered point in red
+    Vector3d P(globalMesh.getVertex(i));
+    glBegin(GL_POINTS);
+    glVertex3f(P[0], P[1], P[2]);
+    glEnd();
+
+    //render the neighbor faces in dark green
+    glColor3f(0,0.5,0);
+
+    set <int> myset ( globalMesh.getP2F_NeighSet(i));
+
+    glEnable(GL_LIGHTING);
+    glBegin(GL_TRIANGLES);
+
+    for ( set <int> :: iterator it = myset.begin(); it != myset.end(); it++)
+        Draw_Face_Normal(*it);
+
+    glEnd();
+
+}
+
+//Draw F2F neigh
+void GLWidget :: DrawF2F_Neigh( int i )
+{
+    if(globalMesh.getF2F_Neigh().empty() || i>globalMesh.getF2F_Neigh().size() ) return;
+
+    //draw the considered face in red
+
+    glBegin(GL_TRIANGLES);
+    glColor3f(1,0,0);
+    Draw_Face_Normal(i);
+
+    //draw neighbor faces in blue
+    glColor3f(0,0,1);
+    set <int> myset ( globalMesh.getF2F_NeighSet(i));
+    for ( set <int> :: iterator it = myset.begin(); it != myset.end(); it++)
+        Draw_Face_Normal(*it);
+    glEnd();
+}
+
+//Draw default
+void GLWidget::Draw_Default(int i)
+{
+    for(int j=0; j<3; j++)
+        glVertex3d(globalMesh.getVertex(i)[0],globalMesh.getVertex(i)[1],globalMesh.getVertex(i)[2]);
+
+
+}
+
+//draw face normal
+void GLWidget::Draw_Face_Normal(int i)
+{
+    for(int j=0; j<3; j++)	{
+        glNormal3d(globalMesh.FaceNormal(i)[0],globalMesh.FaceNormal(i)[1],globalMesh.FaceNormal(i)[2]);
+        Vector3d V=globalMesh.Vertex(i,j);
+        glVertex3d(V[0],V[1],V[2]);
+    }
+}
+
+//draw vertex normal
+void GLWidget::Draw_Vertex_Normal(int i)
+{
+    for(int j=0; j<3; j++)	{
+
+        int vertex_index = globalMesh.Face(i)[j];
+
+        Vector3d N(globalMesh.VertexNormal(vertex_index));
+        Vector3d V(globalMesh.Vertex(vertex_index));
+        glNormal3d(N[0],N[1],N[2]);
+        glVertex3d(V[0],V[1],V[2]);
+    }
+}
+
+
+
+//draw according to the mode
+void GLWidget::Draw(int DRAW_MODE)
+{
+    int nb_faces=globalMesh.FaceNumber();
+    int i;
+
+
+    switch(DRAW_MODE)
+    {
+        case ONLY_VERTEX	:
+        {
+            glDisable(GL_LIGHTING);
+            cout<<"Vertices displayed="<<globalMesh.VertexNumber()<<endl;
+
+            glPointSize(5.0);
+            glBegin(GL_POINTS);
+            bool color_on=false;
+            if(globalMesh.ColorNumber() == globalMesh.VertexNumber()) color_on=true;
+            for( i=0 ; i<globalMesh.VertexNumber(); i++ )
+            {
+                if(color_on) glColor3f(globalMesh.Color(i)[0],globalMesh.Color(i)[1],globalMesh.Color(i)[2]);
+                glVertex3d(globalMesh.Vertex(i)[0],globalMesh.Vertex(i)[1],globalMesh.Vertex(i)[2]);
+            }
+
+            glEnd();
+
+            glEnable(GL_LIGHTING);
+
+        }break;
+
+        case FACE_NORMAL:
+        {
+            glBegin(GL_TRIANGLES);
+            for( i=0; i<nb_faces; i++)
+                Draw_Face_Normal(i);
+        }break;
+
+        case FACE_NORMAL_RGB:
+        {
+            glBegin(GL_TRIANGLES);
+            for( i=0; i<nb_faces; i++)
+                Draw_Face_Normal_Rgb(i);
+            glEnd();
+        }break;
+
+        case VERTEX_NORMAL		:
+        {
+            glBegin(GL_TRIANGLES);
+            for( i=0; i<nb_faces; i++)
+                Draw_Vertex_Normal(i);
+            glEnd();
+        }	break;
+
+        case VERTEX_NORMAL_RGB	:
+        {
+//            vector<Vector3d> delta;
+
+//            for (i = 0; i < vertex.size(); i++)
+//            {
+//                di =
+//                delta.push_back(Vector3d(vertex[i]-1/));
+//            }
+
+//            for (i = 0; i < colors.size(); i++)
+//            {
+//                colors[i] = Vector3d(rand()/(double)RAND_MAX, rand()/(double)RAND_MAX, rand()/(double)RAND_MAX);
+//            }
+
+            glBegin(GL_TRIANGLES);
+            for( i=0; i<globalMesh.FaceNumber(); i++)
+                Draw_Vertex_Normal_Rgb(i);
+            glEnd();
+        }	break;
+
+    }
+}
+
+//Draw face normal rgb
+void GLWidget::Draw_Face_Normal_Rgb(int i)
+{
+    for(int j=0; j<3; j++)	{
+        glNormal3d(globalMesh.FaceNormal(i)[0],globalMesh.FaceNormal(i)[1],globalMesh.FaceNormal(i)[2]);
+        Vector3d V=globalMesh.Vertex(globalMesh.Face(i)[j]);
+        Vector3d C=globalMesh.Color(globalMesh.Face(i)[j]);
+        glColor3d(C[0],C[1],C[2]);
+        glVertex3d(V[0],V[1],V[2]);
+    }
+}
+
+//draw vertex normal rgb
+void GLWidget::Draw_Vertex_Normal_Rgb(int i){
+
+    for(int j=0; j<3; j++)
+    {
+        int vertex_index = globalMesh.Face(i)[j];
+
+        Vector3d N(globalMesh.VertexNormal(vertex_index));
+        Vector3d V(globalMesh.Vertex(vertex_index));
+        Vector3d Col(globalMesh.Color(vertex_index));
+
+        glNormal3d( N[0] , N[1] , N[2]);
+        glColor3d( Col[0] , Col[1] , Col[2]);
+
+        glVertex3d( V[0] , V[1] , V[2]);
     }
 }
 
